@@ -1,4 +1,4 @@
-package com.veyra.novaperutech.shared.domain.model.aggregates;
+package com.novaperutech.veyra.platform.shared.domain.model.aggregates;
 
 import jakarta.persistence.*;
 import lombok.Getter;
