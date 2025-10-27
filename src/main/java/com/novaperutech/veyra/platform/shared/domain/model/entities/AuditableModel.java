@@ -1,4 +1,4 @@
-package com.veyra.novaperutech.shared.domain.model.entities;
+package com.novaperutech.veyra.platform.shared.domain.model.entities;
 
 
 import jakarta.persistence.*;

@@ -1,4 +1,4 @@
-package com.veyra.novaperutech.shared.infrastructure.persistence.jpa;
+package com.novaperutech.veyra.platform.shared.infrastructure.persistence.jpa.strategy;
 
 import org.hibernate.boot.model.naming.Identifier;
 import org.hibernate.boot.model.naming.PhysicalNamingStrategy;
