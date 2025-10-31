@@ -2,6 +2,7 @@ package com.novaperutech.veyra.platform.residents.domain.model.aggregates;
 
 import com.novaperutech.veyra.platform.residents.domain.model.commands.CreateResidentCommand;
 import com.novaperutech.veyra.platform.residents.domain.model.commands.UpdateResidentCommand;
+import com.novaperutech.veyra.platform.residents.domain.model.valueobjects.BloodType;
 import jakarta.persistence.*;
 import lombok.Getter;
 import org.springframework.data.domain.AbstractAggregateRoot;
@@ -29,7 +30,7 @@ public class Resident extends AbstractAggregateRoot<Resident> {
     private String room;
     private String phoneNumber;
     private String email;
-    private String bloodType;
+    private BloodType bloodType;
     private String allergies;
 
     @ElementCollection
@@ -57,10 +58,8 @@ public class Resident extends AbstractAggregateRoot<Resident> {
     private String legalGuardian;
     private String guardianPhone;
 
-    // 🧱 Constructor vacío protegido para JPA
     protected Resident() {}
 
-    // 🧩 Constructor desde CreateResidentCommand
     public Resident(CreateResidentCommand command) {
         this.state = command.state();
         this.name = command.name();
