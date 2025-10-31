@@ -1,4 +1,4 @@
-package com.novaperutech.veyra.platform.residents.domain.model.services;
+package com.novaperutech.veyra.platform.residents.domain.services;
 
 import com.novaperutech.veyra.platform.residents.domain.model.aggregates.Resident;
 import com.novaperutech.veyra.platform.residents.domain.model.commands.CreateResidentCommand;
