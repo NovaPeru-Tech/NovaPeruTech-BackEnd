@@ -4,7 +4,7 @@ import com.novaperutech.veyra.platform.residents.domain.model.aggregates.Residen
 import com.novaperutech.veyra.platform.residents.domain.model.commands.CreateResidentCommand;
 import com.novaperutech.veyra.platform.residents.domain.model.commands.UpdateResidentCommand;
 import com.novaperutech.veyra.platform.residents.domain.model.commands.DeleteResidentCommand;
-import com.novaperutech.veyra.platform.residents.domain.model.services.ResidentCommandService;
+import com.novaperutech.veyra.platform.residents.domain.services.ResidentCommandService;
 import com.novaperutech.veyra.platform.residents.infrastructure.persistence.jpa.ResidentRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

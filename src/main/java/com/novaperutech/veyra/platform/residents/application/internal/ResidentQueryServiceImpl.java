@@ -1,7 +1,7 @@
 package com.novaperutech.veyra.platform.residents.application.internal;
 
 import com.novaperutech.veyra.platform.residents.domain.model.aggregates.Resident;
-import com.novaperutech.veyra.platform.residents.domain.model.services.ResidentQueryService;
+import com.novaperutech.veyra.platform.residents.domain.services.ResidentQueryService;
 import com.novaperutech.veyra.platform.residents.infrastructure.persistence.jpa.ResidentRepository;
 import org.springframework.stereotype.Service;
 import java.util.List;
