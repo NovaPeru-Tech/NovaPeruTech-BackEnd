@@ -1,9 +1,10 @@
 package com.novaperutech.veyra.platform.residents.interfaces.rest.controllers;
 
-import com.novaperutech.veyra.platform.residents.domain.model.services.ResidentCommandService;
-import com.novaperutech.veyra.platform.residents.domain.model.services.ResidentQueryService;
+import com.novaperutech.veyra.platform.residents.domain.services.ResidentCommandService;
+import com.novaperutech.veyra.platform.residents.domain.services.ResidentQueryService;
 import com.novaperutech.veyra.platform.residents.interfaces.rest.resources.*;
 import com.novaperutech.veyra.platform.residents.interfaces.rest.transform.*;
+import jakarta.validation.Valid;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,11 +39,11 @@ public class ResidentController {
     }
 
     @PostMapping
-    public ResponseEntity<ResidentResource> create(@RequestBody CreateResidentResource resource) {
+    public ResponseEntity<ResidentResource> createResident(@Valid @RequestBody CreateResidentResource resource) {
         var command = CreateResidentCommandFromResourceAssembler.toCommand(resource);
-        var created = residentCommandService.handle(command);
-        var residentResource = ResidentResourceFromEntityAssembler.toResource(created);
-        return new ResponseEntity<>(residentResource, HttpStatus.CREATED);
+        var resident = residentCommandService.handle(command);
+        var resourceResponse = ResidentResourceFromEntityAssembler.toResource(resident);
+        return ResponseEntity.status(HttpStatus.CREATED).body(resourceResponse);
     }
 
     @PutMapping("/{id}")
