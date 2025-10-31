@@ -1,5 +1,7 @@
 package com.novaperutech.veyra.platform.residents.interfaces.rest.resources;
 
+import com.novaperutech.veyra.platform.residents.domain.model.valueobjects.BloodType;
+
 import java.time.LocalDate;
 import java.util.List;
 
@@ -15,7 +17,7 @@ public record ResidentResource(
         String room,
         String phoneNumber,
         String email,
-        String bloodType,
+        BloodType bloodType,
         String allergies,
         List<String> chronicDiseases,
         String currentMedications,
