@@ -95,7 +95,6 @@ public class Resident extends AbstractAggregateRoot<Resident> {
         this.guardianPhone = command.guardianPhone();
     }
 
-    // 🔁 Método update() usando UpdateResidentCommand
     public void update(UpdateResidentCommand command) {
         if (command.state() != null) this.state = command.state();
         if (command.name() != null) this.name = command.name();
