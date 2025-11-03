@@ -1,11 +1,11 @@
-package com.novaperutech.veyra.platform.residents.application.internal;
+package com.novaperutech.veyra.platform.residents.application.internal.commandservices;
 
 import com.novaperutech.veyra.platform.residents.domain.model.aggregates.Resident;
 import com.novaperutech.veyra.platform.residents.domain.model.commands.CreateResidentCommand;
 import com.novaperutech.veyra.platform.residents.domain.model.commands.UpdateResidentCommand;
 import com.novaperutech.veyra.platform.residents.domain.model.commands.DeleteResidentCommand;
 import com.novaperutech.veyra.platform.residents.domain.services.ResidentCommandService;
-import com.novaperutech.veyra.platform.residents.infrastructure.persistence.jpa.ResidentRepository;
+import com.novaperutech.veyra.platform.residents.infrastructure.persistence.jpa.repositories.ResidentRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,9 +20,15 @@ public class ResidentCommandServiceImpl implements ResidentCommandService {
     }
 
     @Override
-    public Resident handle(CreateResidentCommand command) {
-        Resident resident = new Resident(command);
-        return residentRepository.save(resident);
+    public Long handle(CreateResidentCommand command) {
+
+        var resident= new Resident(command);
+        try {
+            residentRepository.save(resident);
+        } catch (Exception e ){
+            throw new IllegalArgumentException(" Error creating resident: " + e.getMessage());
+        }
+        return resident.getId();
     }
 
     @Override
