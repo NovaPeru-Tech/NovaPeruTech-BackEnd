@@ -7,7 +7,7 @@ import com.novaperutech.veyra.platform.residents.domain.model.commands.DeleteRes
 
 public interface ResidentCommandService {
 
-    Resident handle(CreateResidentCommand command);
+    Long handle(CreateResidentCommand command);
     Resident handle(UpdateResidentCommand command);
     void handle(DeleteResidentCommand command);
 }

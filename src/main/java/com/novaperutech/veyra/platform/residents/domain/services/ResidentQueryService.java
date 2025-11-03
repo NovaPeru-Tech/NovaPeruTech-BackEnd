@@ -1,18 +1,15 @@
 package com.novaperutech.veyra.platform.residents.domain.services;
 
 import com.novaperutech.veyra.platform.residents.domain.model.aggregates.Resident;
+import com.novaperutech.veyra.platform.residents.domain.model.queries.GetAllResidentsQuery;
+import com.novaperutech.veyra.platform.residents.domain.model.queries.GetResidentByIdQuery;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface ResidentQueryService {
 
-    // Obtener todos los residentes
-    List<Resident> handle();
+    List<Resident> handle(GetAllResidentsQuery query);
+    Optional<Resident> handle(GetResidentByIdQuery query);
 
-    // Obtener por ID
-    Optional<Resident> handle(Long id);
-
-    // Obtener por estado
-    List<Resident> handle(String state);
 }
