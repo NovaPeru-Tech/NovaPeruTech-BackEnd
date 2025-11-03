@@ -1,7 +1,5 @@
 package com.novaperutech.veyra.platform.residents.domain.model.commands;
 
-import com.novaperutech.veyra.platform.residents.domain.model.valueobjects.BloodType;
-
 import java.time.LocalDate;
 import java.util.List;
 
@@ -17,7 +15,6 @@ public record UpdateResidentCommand(
         String room,
         String phoneNumber,
         String email,
-        BloodType bloodType,
         String allergies,
         List<String> chronicDiseases,
         String currentMedications,
