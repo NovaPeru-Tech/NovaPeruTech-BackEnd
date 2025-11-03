@@ -18,7 +18,6 @@ public class UpdateResidentCommandFromResourceAssembler {
                 resource.room(),
                 resource.phoneNumber(),
                 resource.email(),
-                resource.bloodType(),
                 resource.allergies(),
                 resource.chronicDiseases(),
                 resource.currentMedications(),

@@ -18,27 +18,11 @@ public class ResidentResourceFromEntityAssembler {
                 entity.getRoom(),
                 entity.getPhoneNumber(),
                 entity.getEmail(),
-                entity.getBloodType(),
-                entity.getAllergies(),
-                entity.getChronicDiseases(),
-                entity.getCurrentMedications(),
-                entity.getSpecialDiet(),
-                entity.getMobilityLevel(),
-                entity.getDependencyLevel(),
-                entity.isNeedsBathingAssistance(),
-                entity.isNeedsFeedingAssistance(),
-                entity.isNeedsDressingAssistance(),
-                entity.getEmergencyContactName(),
-                entity.getEmergencyPhone(),
-                entity.getContactRelation(),
-                entity.getSecondaryContact(),
-                entity.getSecondaryPhone(),
-                entity.getAdmissionDate(),
-                entity.getAttendingPhysician(),
-                entity.getMedicalInsurance(),
-                entity.getSocialSecurityNumber(),
-                entity.getLegalGuardian(),
-                entity.getGuardianPhone()
+                entity.getEmergencyContact().getName().getFullName(),
+                entity.getEmergencyContact().getPhoneNumber().phoneNumber(),
+                entity.getEmergencyContact().getRelationShip().toString(),
+                entity.getLegalRepresentative().getName().getFullName(),
+                entity.getLegalRepresentative().getPhoneNumber().phoneNumber()
         );
     }
 }
