@@ -1,0 +1,217 @@
+@startuml
+package "IAM Bounded Context" {
+
+    package "Domain" {
+        package "Model" {
+            package "Aggregates" {
+                class User <<(A,blue) Aggregate Root>> {
+                    + id: Long
+                    + emailAddress: EmailAddress
+                    + password: Password
+                    + personName: PersonName
+                    --
+                    + signUp(command: SignUpCommand, hashingService: HashingService)
+                    + signIn(command: SignInCommand, hashingService: HashingService): Token
+                    + signInByEmail(command: SignInByEmailCommand, hashingService: HashingService): Token
+                    + changePassword(oldPassword: Password, newPassword: Password, hashingService: HashingService)
+                    + updateProfile(newName: PersonName)
+                }
+            }
+
+            package "Commands" {
+                class SignInByEmailCommand <<(C,RoyalBlue) Command>> {
+                    + email: String
+                    + password: String
+                }
+                class SignInCommand <<(C,RoyalBlue) Command>> {
+                    + username: String
+                    + password: String
+                }
+                class SignUpCommand <<(C,RoyalBlue) Command>> {
+                    + email: String
+                    + password: String
+                    + name: String
+                }
+            }
+
+            package "Queries" {
+                class GetAllUsersQuery <<(Q,orange) Query>>
+                class GetUserByIdQuery <<(Q,orange) Query>> {
+                    + userId: Long
+                }
+                class GetUserByUsernameQuery <<(Q,orange) Query>> {
+                    + username: String
+                }
+            }
+
+            package "Value Objects" {
+                class EmailAddress <<(V,pink) Value Object>> {
+                    + value: String
+                }
+                class Password <<(V,pink) Value Object>> {
+                    + value: String
+                }
+                class PersonName <<(V,pink) Value Object>> {
+                    + value: String
+                }
+            }
+        }
+    }
+
+    package "Application" {
+        package "Internal" {
+            package "Command Services" {
+                interface UserCommandService <<(I,lightgray) Interface>>
+                class UserCommandServiceImpl implements UserCommandService
+            }
+
+            package "Query Services" {
+                interface UserQueryService <<(I,lightgray) Interface>>
+                class UserQueryServiceImpl implements UserQueryService
+            }
+        }
+
+        package "Outbound Services" {
+            package "Hashing" {
+                interface HashingService <<(I,lightgray) Interface>>
+            }
+            package "Tokens" {
+                interface TokenService <<(I,lightgray) Interface>>
+            }
+        }
+    }
+
+    package "Infrastructure" {
+        package "Authorization.SFS" {
+            ' SFS = System For System (Anti-Corruption Layer)
+            package "Configuration" {
+                class WebSecurityConfiguration
+            }
+            package "Model" {
+                class UserDetailsImpl
+                class UsernamePasswordAuthenticationTokenBuilder
+            }
+            package "Pipeline" {
+                class BearerAuthorizationRequestFilter
+                class UnauthorizedRequestEntrypoint
+            }
+            package "Services" {
+                class UserDetailsServiceImpl
+            }
+        }
+
+        package "Hashing.BCrypt" {
+            package "Services" {
+                class HashingServiceImpl implements HashingService
+                class BCryptHashingService
+            }
+        }
+
+        package "Persistence.JPA.Repositories" {
+            interface UserRepository <<(R,steelblue) Repository>> {
+                + findByEmailAddress(email: EmailAddress): Optional<User>
+                + save(user: User): User
+                + findById(id: Long): Optional<User>
+            }
+        }
+
+        package "Tokens.JWT" {
+            package "Services" {
+                class TokenServiceImpl implements TokenService
+                class BearerTokenService
+            }
+        }
+
+        package "Interfaces.REST" {
+            package "Resources" {
+                class AuthenticatedUserByEmailResource
+                class AuthenticatedUserResource
+                class SignInEmailResource
+                class SignInResource
+                class SignUpResource
+                class UserResource
+            }
+            package "Transform" {
+                class AuthenticatedUserResourceFromEntityAssembler
+                class AuthenticateUserByEmailResourceFromEntityAssembler
+                class SignInCommandFromResourceAssembler
+                class SignUpCommandFromResourceAssembler
+                class UserResourceFromEntityAssembler
+            }
+            class AuthenticationController <<(C,red) REST Controller>>
+            class UsersController <<(C,red) REST Controller>>
+        }
+    }
+
+    ' Relationships '
+
+    User -- "1" EmailAddress
+    User -- "1" Password
+    User -- "1" PersonName
+
+    SignUpCommand ..> EmailAddress
+    SignUpCommand ..> Password
+    SignUpCommand ..> PersonName
+    SignInCommand ..> Password
+    SignInByEmailCommand ..> EmailAddress
+    SignInByEmailCommand ..> Password
+
+    GetUserByIdQuery ..> User
+    GetUserByUsernameQuery ..> User
+    GetAllUsersQuery ..> User
+
+    UserCommandServiceImpl .up.|> UserCommandService
+    UserQueryServiceImpl .up.|> UserQueryService
+    HashingServiceImpl .up.|> HashingService
+    TokenServiceImpl .up.|> TokenService
+
+    UserCommandServiceImpl ..> UserRepository : uses
+    UserCommandServiceImpl ..> HashingService : uses
+    UserCommandServiceImpl ..> TokenService : uses
+    UserQueryServiceImpl ..> UserRepository : uses
+
+    AuthenticationController ..> UserCommandService : uses
+    AuthenticationController ..> SignInCommandFromResourceAssembler : uses
+    AuthenticationController ..> SignUpCommandFromResourceAssembler : uses
+    AuthenticationController ..> AuthenticatedUserResourceFromEntityAssembler : uses
+    AuthenticationController ..> AuthenticateUserByEmailResourceFromEntityAssembler : uses
+    AuthenticationController ..> SignInResource : consumes
+    AuthenticationController ..> SignUpResource : consumes
+    AuthenticationController ..> AuthenticatedUserResource : produces
+    AuthenticationController ..> SignInEmailResource : consumes
+
+    UsersController ..> UserQueryService : uses
+    UsersController ..> UserResourceFromEntityAssembler : uses
+    UsersController ..> UserResource : produces
+
+    SignInCommandFromResourceAssembler ..> SignInCommand : creates
+    SignInCommandFromResourceAssembler ..> SignInResource : transforms from
+
+    SignUpCommandFromResourceAssembler ..> SignUpCommand : creates
+    SignUpCommandFromResourceAssembler ..> SignUpResource : transforms from
+
+    AuthenticatedUserResourceFromEntityAssembler ..> AuthenticatedUserResource : creates
+    AuthenticatedUserResourceFromEntityAssembler ..> User : transforms from
+
+    AuthenticateUserByEmailResourceFromEntityAssembler ..> AuthenticatedUserByEmailResource : creates
+    AuthenticateUserByEmailResourceFromEntityAssembler ..> User : transforms from
+
+    UserResourceFromEntityAssembler ..> UserResource : creates
+    UserResourceFromEntityAssembler ..> User : transforms from
+
+    WebSecurityConfiguration ..> UserDetailsServiceImpl : configures
+    WebSecurityConfiguration ..> UsernamePasswordAuthenticationTokenBuilder : configures
+    WebSecurityConfiguration ..> BearerAuthorizationRequestFilter : configures
+    WebSecurityConfiguration ..> UnauthorizedRequestEntrypoint : configures
+    BearerAuthorizationRequestFilter ..> TokenService : validates
+    UserDetailsServiceImpl ..> UserRepository : loads users
+    UserDetailsImpl ..> User : adapts
+
+    HashingServiceImpl ..> BCryptHashingService : uses
+    TokenServiceImpl ..> BearerTokenService : uses
+
+    User -- HashingService : uses for password ops
+    User -- TokenService : uses for token creation (e.g., on sign-in)
+
+}
+@enduml
