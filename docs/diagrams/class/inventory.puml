@@ -1,0 +1,573 @@
+@startuml
+package "medications Bounded Context" {
+
+    package "domain" {
+        package "exceptions" {
+            class MedicationNotFoundException<<exception>> {
+                +MedicationNotFoundException(Long)
+                +MedicationNotFoundException(String)
+            }
+
+            class InvalidStockLevelException<<exception>> {
+                +InvalidStockLevelException(String)
+            }
+
+            class ExpiredMedicationException<<exception>> {
+                +ExpiredMedicationException(String)
+            }
+
+            class DuplicateBarcodeException<<exception>> {
+                +DuplicateBarcodeException(String)
+            }
+
+            class InvalidExpirationDateException<<exception>> {
+                +InvalidExpirationDateException(Date)
+            }
+
+            class NursingHomeNotFoundException<<exception>> {
+                +NursingHomeNotFoundException(Long)
+            }
+        }
+
+        package "model" {
+            package "aggregates" {
+                class Medication <<aggregate>> {
+                    -Long id
+                    -MedicationName name
+                    -String image
+                    -MedicationType type
+                    -MeasurementUnit unit
+                    -ExpirationDate expirationDate
+                    -Supplier supplier
+                    -Quantity quantity
+                    -Concentration concentration
+                    -PharmaceuticalForm pharmaceuticalForm
+                    -AdministrationRoute administrationRoute
+                    -StorageLocation storageLocation
+                    -StockLevels stockLevels
+                    -List<String> contraindications
+                    -List<String> storageConditions
+                    -NursingHomeId nursingHomeId
+                    +Medication()
+                    +Medication(CreateMedicationCommand)
+                    +updateQuantity(Integer): void
+                    +isExpired(): boolean
+                    +needsRestock(): boolean
+                    +isOverstocked(): boolean
+                    +updateInformation(UpdateMedicationCommand): void
+                }
+            }
+
+            package "commands" {
+                class CreateMedicationCommand<<record>> {
+                    +String name
+                    +String image
+                    +String type
+                    +String unit
+                    +Date expirationDate
+                    +String supplier
+                    +Integer quantity
+                    +String concentration
+                    +String pharmaceuticalForm
+                    +String administrationRoute
+                    +String storageLocation
+                    +Integer minimumStock
+                    +Integer maximumStock
+                    +Boolean requiresRefrigeration
+                    +Boolean requiresPrescription
+                    +List<String> contraindications
+                    +List<String> storageConditions
+                    +Long nursingHomeId
+                }
+
+                class UpdateMedicationCommand<<record>> {
+                    +Long medicationId
+                    +String name
+                    +String image
+                    +String supplier
+                    +String concentration
+                    +String storageLocation
+                    +Integer minimumStock
+                    +Integer maximumStock
+                    +List<String> contraindications
+                    +List<String> storageConditions
+                }
+
+                class DeleteMedicationCommand<<record>> {
+                    +Long medicationId
+                }
+
+                class UpdateStockCommand<<record>> {
+                    +Long medicationId
+                    +Integer newQuantity
+                }
+
+                class UpdateExpirationDateCommand<<record>> {
+                    +Long medicationId
+                    +Date newExpirationDate
+                }
+            }
+
+            package "queries" {
+                class GetAllMedicationsQuery<<record>> {
+                }
+
+                class GetMedicationByIdQuery<<record>> {
+                    +Long medicationId
+                }
+
+                class GetMedicationsByNursingHomeIdQuery<<record>> {
+                    +Long nursingHomeId
+                }
+
+                class GetExpiredMedicationsQuery<<record>> {
+                    +Long nursingHomeId
+                }
+
+                class GetLowStockMedicationsQuery<<record>> {
+                    +Long nursingHomeId
+                }
+
+                class GetMedicationsByTypeQuery<<record>> {
+                    +Long nursingHomeId
+                    +String type
+                }
+
+                class GetMedicationByBarcodeQuery<<record>> {
+                    +String barcode
+                }
+            }
+
+            package "valueobjects" {
+                class MedicationName<<record>> {
+                    +String name
+                }
+
+                class MedicationType<<enum>> {
+                    TABLET
+                    CAPSULE
+                    LIQUID
+                    INJECTION
+                    CREAM
+                    OINTMENT
+                    DROPS
+                    INHALER
+                    PATCH
+                }
+
+                class MeasurementUnit<<enum>> {
+                    MG
+                    ML
+                    UNITS
+                    GRAMS
+                    PIECES
+                }
+
+                class ExpirationDate<<record>> {
+                    +Date expirationDate
+                    +isExpired(): boolean
+                    +daysUntilExpiration(): long
+                }
+
+                class Supplier<<record>> {
+                    +String supplier
+                }
+
+                  class Quantity<<record>> {
+                    +Integer quantity
+                    +increase(Integer): Quantity
+                    +decrease(Integer): Quantity
+                }
+
+                class Concentration<<record>> {
+                    +String concentration
+                }
+
+                class PharmaceuticalForm<<record>> {
+                    +String pharmaceuticalForm
+                }
+
+                class AdministrationRoute<<enum>> {
+                    ORAL
+                    INTRAVENOUS
+                    INTRAMUSCULAR
+                    SUBCUTANEOUS
+                    TOPICAL
+                    INHALATION
+                    RECTAL
+                    SUBLINGUAL
+                }
+
+                class StorageLocation<<record>> {
+                    +String storageLocation
+                }
+
+                class StockLevels<<record>> {
+                    +Integer minimumStock
+                    +Integer maximumStock
+                    +isLowStock(Integer): boolean
+                    +isOverstocked(Integer): boolean
+                }
+
+                class NursingHomeId<<record>> {
+                    +Long nursingHomeId
+                }
+            }
+
+            package "entities" {
+                class MedicationHistory {
+                    -Long id
+                    -Medication medication
+                    -String action
+                    -Integer previousQuantity
+                    -Integer newQuantity
+                    -String performedBy
+                    -LocalDateTime timestamp
+                    +MedicationHistory()
+                    +MedicationHistory(Medication, String, Integer, Integer, String)
+                }
+            }
+
+            package "events" {
+                class MedicationCreatedEvent<<event>> {
+                    +Long medicationId
+                    +String medicationName
+                    +Long nursingHomeId
+                    +LocalDateTime occurredOn
+                }
+
+                class MedicationExpiredEvent<<event>> {
+                    +Long medicationId
+                    +String medicationName
+                    +Date expirationDate
+                    +LocalDateTime occurredOn
+                }
+
+                class LowStockEvent<<event>> {
+                    +Long medicationId
+                    +String medicationName
+                    +Integer currentStock
+                    +Integer minimumStock
+                    +LocalDateTime occurredOn
+                }
+
+                class MedicationDeletedEvent<<event>> {
+                    +Long medicationId
+                    +LocalDateTime occurredOn
+                }
+            }
+        }
+
+        package "services" {
+            interface MedicationCommandService {
+                +handle(CreateMedicationCommand): Optional<Medication>
+                +handle(UpdateMedicationCommand): Optional<Medication>
+                +handle(DeleteMedicationCommand): void
+                +handle(UpdateStockCommand): Optional<Medication>
+            }
+
+            interface MedicationQueryService {
+                +handle(GetAllMedicationsQuery): List<Medication>
+                +handle(GetMedicationByIdQuery): Optional<Medication>
+                +handle(GetMedicationsByNursingHomeIdQuery): List<Medication>
+                +handle(GetExpiredMedicationsQuery): List<Medication>
+                +handle(GetLowStockMedicationsQuery): List<Medication>
+                +handle(GetMedicationsByTypeQuery): List<Medication>
+                +handle(GetMedicationByBarcodeQuery): Optional<Medication>
+            }
+        }
+    }
+
+    package "application" {
+        package "internal" {
+            package "outboundservices.acl" {
+                class NursingHomeContextFacade<<service>> {
+                    -RestTemplate restTemplate
+                    -String nursingHomeServiceUrl
+                    +validateNursingHomeExists(Long): boolean
+                    +getNursingHomeName(Long): String
+                }
+            }
+
+            package "commandservices" {
+                class MedicationCommandServiceImpl {
+                    -MedicationRepository medicationRepository
+                    -MedicationHistoryRepository historyRepository
+                    -NursingHomeContextFacade nursingHomeFacade
+                    -ApplicationEventPublisher eventPublisher
+                    +handle(CreateMedicationCommand): Optional<Medication>
+                    +handle(UpdateMedicationCommand): Optional<Medication>
+                    +handle(DeleteMedicationCommand): void
+                    +handle(UpdateStockCommand): Optional<Medication>
+                }
+            }
+
+            package "queryservices" {
+                class MedicationQueryServiceImpl {
+                    -MedicationRepository medicationRepository
+                    +handle(GetAllMedicationsQuery): List<Medication>
+                    +handle(GetMedicationByIdQuery): Optional<Medication>
+                    +handle(GetMedicationsByNursingHomeIdQuery): List<Medication>
+                    +handle(GetExpiredMedicationsQuery): List<Medication>
+                    +handle(GetLowStockMedicationsQuery): List<Medication>
+                    +handle(GetMedicationsByTypeQuery): List<Medication>
+                    +handle(GetMedicationByBarcodeQuery): Optional<Medication>
+                }
+            }
+
+            package "eventhandlers" {
+                class MedicationEventHandler {
+                    -NotificationService notificationService
+                    +handleMedicationExpired(MedicationExpiredEvent): void
+                    +handleLowStock(LowStockEvent): void
+                }
+            }
+        }
+    }
+
+    package "infrastructure" {
+        package "persistence.jpa.repositories" {
+            interface MedicationRepository<<interface>> {
+                +findByNursingHomeId(NursingHomeId): List<Medication>
+                +findByBarcode(Barcode): Optional<Medication>
+                +findExpiredByNursingHomeId(Long, Date): List<Medication>
+                +findLowStockByNursingHomeId(Long): List<Medication>
+                +findByTypeAndNursingHomeId(MedicationType, Long): List<Medication>
+                +existsByBarcode(Barcode): boolean
+            }
+
+            interface MedicationHistoryRepository<<interface>> {
+                +findByMedicationId(Long): List<MedicationHistory>
+                +save(MedicationHistory): MedicationHistory
+            }
+        }
+    }
+
+    package "interfaces.rest" {
+        package "resources" {
+            class CreateMedicationResource<<record>> {
+                +String name
+                +String image
+                +String type
+                +String unit
+                +String expirationDate
+                +String supplier
+                +BigDecimal unitCost
+                +Integer quantity
+                +String concentration
+                +String pharmaceuticalForm
+                +String batchNumber
+                +String administrationRoute
+                +String storageLocation
+                +Integer minimumStock
+                +Integer maximumStock
+                +Boolean requiresRefrigeration
+                +Boolean requiresPrescription
+                +List<String> contraindications
+                +String specialNotes
+                +String barcode
+                +String registrationNumber
+                +List<String> storageConditions
+                +Long nursingHomeId
+            }
+
+            class UpdateMedicationResource<<record>> {
+                +String name
+                +String image
+                +String supplier
+                +BigDecimal unitCost
+                +String concentration
+                +String storageLocation
+                +Integer minimumStock
+                +Integer maximumStock
+                +List<String> contraindications
+                +String specialNotes
+                +List<String> storageConditions
+            }
+
+            class MedicationResource<<record>> {
+                +Long id
+                +String name
+                +String image
+                +String type
+                +String unit
+                +String expirationDate
+                +String supplier
+                +BigDecimal unitCost
+                +String lastUpdate
+                +Integer quantity
+                +String concentration
+                +String pharmaceuticalForm
+                +String batchNumber
+                +String administrationRoute
+                +String storageLocation
+                +Integer minimumStock
+                +Integer maximumStock
+                +Boolean requiresRefrigeration
+                +Boolean requiresPrescription
+                +List<String> contraindications
+                +String specialNotes
+                +String barcode
+                +String registrationNumber
+                +List<String> storageConditions
+                +Long nursingHomeId
+                +Boolean isExpired
+                +Boolean needsRestock
+            }
+
+            class UpdateStockResource<<record>> {
+                +Integer newQuantity
+            }
+        }
+
+        package "transform" {
+            class CreateMedicationCommandFromResourceAssembler {
+                +{static} toCommandFromResource(CreateMedicationResource): CreateMedicationCommand
+            }
+
+            class UpdateMedicationCommandFromResourceAssembler {
+                +{static} toCommandFromResource(Long, UpdateMedicationResource): UpdateMedicationCommand
+            }
+
+            class MedicationResourceFromEntityAssembler {
+                +{static} toResourceFromEntity(Medication): MedicationResource
+                +{static} toResourceListFromEntityList(List<Medication>): List<MedicationResource>
+            }
+
+            class UpdateStockCommandFromResourceAssembler {
+                +{static} toCommandFromResource(Long, UpdateStockResource): UpdateStockCommand
+            }
+        }
+
+        class MedicationsController {
+            -MedicationCommandService medicationCommandService
+            -MedicationQueryService medicationQueryService
+            +createMedication(CreateMedicationResource): ResponseEntity<MedicationResource>
+            +updateMedication(Long, UpdateMedicationResource): ResponseEntity<MedicationResource>
+            +deleteMedication(Long): ResponseEntity<Void>
+            +updateStock(Long, UpdateStockResource): ResponseEntity<MedicationResource>
+            +getAllMedications(): ResponseEntity<List<MedicationResource>>
+            +getMedicationById(Long): ResponseEntity<MedicationResource>
+            +getMedicationsByNursingHome(Long): ResponseEntity<List<MedicationResource>>
+            +getExpiredMedications(Long): ResponseEntity<List<MedicationResource>>
+            +getLowStockMedications(Long): ResponseEntity<List<MedicationResource>>
+            +getMedicationByBarcode(String): ResponseEntity<MedicationResource>
+        }
+    }
+
+    package "interfaces.acl" {
+        class MedicationsContextFacade {
+            -MedicationQueryService medicationQueryService
+            +getMedicationById(Long): Optional<Medication>
+            +checkMedicationAvailability(Long, Integer): boolean
+        }
+    }
+}
+
+' ==========================================
+' RELATIONSHIPS - AGGREGATES
+' ==========================================
+
+Medication *-- MedicationName
+Medication *-- MedicationType
+Medication *-- MeasurementUnit
+Medication *-- ExpirationDate
+Medication *-- Supplier
+Medication *-- UnitCost
+Medication *-- Quantity
+Medication *-- Concentration
+Medication *-- PharmaceuticalForm
+Medication *-- BatchNumber
+Medication *-- AdministrationRoute
+Medication *-- StorageLocation
+Medication *-- StockLevels
+Medication *-- Barcode
+Medication *-- RegistrationNumber
+Medication *-- NursingHomeId
+
+MedicationHistory --> Medication
+
+' ==========================================
+' RELATIONSHIPS - COMMANDS
+' ==========================================
+
+Medication ..> CreateMedicationCommand : creates from
+Medication ..> UpdateMedicationCommand : updates from
+
+' ==========================================
+' RELATIONSHIPS - COMMAND SERVICES
+' ==========================================
+
+MedicationCommandServiceImpl ..|> MedicationCommandService
+MedicationCommandServiceImpl --> MedicationRepository
+MedicationCommandServiceImpl --> MedicationHistoryRepository
+MedicationCommandServiceImpl --> NursingHomeContextFacade
+MedicationCommandServiceImpl ..> CreateMedicationCommand : handles
+MedicationCommandServiceImpl ..> UpdateMedicationCommand : handles
+MedicationCommandServiceImpl ..> DeleteMedicationCommand : handles
+MedicationCommandServiceImpl ..> UpdateStockCommand : handles
+
+' ==========================================
+' RELATIONSHIPS - QUERY SERVICES
+' ==========================================
+
+MedicationQueryServiceImpl ..|> MedicationQueryService
+MedicationQueryServiceImpl --> MedicationRepository
+MedicationQueryServiceImpl ..> GetAllMedicationsQuery : handles
+MedicationQueryServiceImpl ..> GetMedicationByIdQuery : handles
+MedicationQueryServiceImpl ..> GetMedicationsByNursingHomeIdQuery : handles
+MedicationQueryServiceImpl ..> GetExpiredMedicationsQuery : handles
+MedicationQueryServiceImpl ..> GetLowStockMedicationsQuery : handles
+MedicationQueryServiceImpl ..> GetMedicationsByTypeQuery : handles
+MedicationQueryServiceImpl ..> GetMedicationByBarcodeQuery : handles
+
+' ==========================================
+' RELATIONSHIPS - EVENT HANDLERS
+' ==========================================
+
+MedicationEventHandler ..> MedicationExpiredEvent : handles
+MedicationEventHandler ..> LowStockEvent : handles
+
+' ==========================================
+' RELATIONSHIPS - CONTROLLERS
+' ==========================================
+
+MedicationsController --> MedicationCommandService
+MedicationsController --> MedicationQueryService
+MedicationsController ..> CreateMedicationResource : receives
+MedicationsController ..> UpdateMedicationResource : receives
+MedicationsController ..> MedicationResource : returns
+MedicationsController ..> UpdateStockResource : receives
+
+' ==========================================
+' RELATIONSHIPS - ASSEMBLERS
+' ==========================================
+
+CreateMedicationCommandFromResourceAssembler ..> CreateMedicationResource : transforms
+CreateMedicationCommandFromResourceAssembler ..> CreateMedicationCommand : creates
+
+UpdateMedicationCommandFromResourceAssembler ..> UpdateMedicationResource : transforms
+UpdateMedicationCommandFromResourceAssembler ..> UpdateMedicationCommand : creates
+
+MedicationResourceFromEntityAssembler ..> Medication : transforms
+MedicationResourceFromEntityAssembler ..> MedicationResource : creates
+
+UpdateStockCommandFromResourceAssembler ..> UpdateStockResource : transforms
+UpdateStockCommandFromResourceAssembler ..> UpdateStockCommand : creates
+
+' ==========================================
+' RELATIONSHIPS - CONTROLLERS USE ASSEMBLERS
+' ==========================================
+
+MedicationsController ..> CreateMedicationCommandFromResourceAssembler : uses
+MedicationsController ..> UpdateMedicationCommandFromResourceAssembler : uses
+MedicationsController ..> MedicationResourceFromEntityAssembler : uses
+MedicationsController ..> UpdateStockCommandFromResourceAssembler : uses
+
+' ==========================================
+' RELATIONSHIPS - ACL
+' ==========================================
+
+MedicationsContextFacade --> MedicationQueryService
+
+@enduml

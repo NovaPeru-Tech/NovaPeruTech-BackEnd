@@ -1,0 +1,131 @@
+@startuml
+package "staff-management Bounded Context" {
+
+    package "Domain" {
+        package "Model" {
+            package "Aggregates" {
+            class "Employee" {
+                id: Long
+                typeOfContract: TypeOfContract
+                Position: Position
+                workShift:WorkShift
+                assignedSchedules: AssignedSchedules
+              hireDate:Date
+              profileId:"ProfileId"
+            }
+            }
+            package "Commands" {
+            class "CreateEmployeeCommand"<<Commands>>{
+               Name:string
+               LastName:String
+               Dni:String
+               phoneNumber:String
+               Position:String
+               typeOfContract:String
+               hireDate:Date
+               Position:String
+               workShift:string
+
+            }
+           class "UpdateEmployeeCommand"<<Commands>>{
+           }
+           class "DeleteEmployeeCommand"<<Command>>{
+           }
+            }
+            package "Queries" {
+            class GetAllEmployeeQuery{
+            }
+            class GetByPositionQuery{
+            }
+            class GetByTypeOfContract{
+            }
+            class GetAssignedSchedules{
+            }
+
+            }
+            package "Value Objects" {
+
+               class "ProfileId"<<record>> {
+                profileId:Long
+                }
+             class "TypeOfContract" <<enum>>{
+                FULL_TIME
+                PART_TIME
+                TEMPORARY_CONTRACT
+             }
+             class "Position" <<enum>>{
+                DOCTOR
+                NURSE
+                RECEPTIONIST
+                INTERN
+                CLEANING_STAFF
+                SECURITY
+
+             }
+            class "WorkShift"<<enum>> {
+                tomorrow
+                late
+                night
+                }
+                class "AssignedSchedules"<<record>> {
+                assignedSchedules:string
+                }
+
+
+            }
+
+            package "entities" {
+            }
+            package "exceptions" {
+            class "EmployeeNotFoundException"<<exception>> {
+            }
+ class "InvalidContractTypeException" <<exception>>
+   class "InvalidPositionException" <<exception>>
+   class "InvalidWorkShiftException" <<exception>>
+   class "InvalidHireDateException" <<exception>>
+   class "InvalidProfileIdException" <<exception>>
+  class "InactiveEmployeeException" <<exception>>
+  class "DuplicateEmployeeException" <<exception>>
+  class "ScheduleConflictException" <<exception>>
+  class "ExceedWorkShiftHoursException" <<exception>>
+  class "ContractExpiredException" <<exception>>
+
+            }
+            package "events"{
+            }
+        }
+    }
+
+    package "application" {
+        package "Internal" {
+
+        package "outboundeservices.acl"{
+        }
+            package "commandservices" {
+            }
+            package "queryservices" {
+            }
+        }
+    }
+
+    package "infrastructure" {
+        package "persistence.jpa.repositories" {
+        }
+    }
+     package "interfaces.rest" {
+                package "resources" {
+                }
+                package "transform" {
+                }
+
+            }
+            package "interfaces.acl"{
+            }
+
+Employee *-- TypeOfContract
+Employee *-- Position
+Employee *-- WorkShift
+Employee *-- AssignedSchedules
+Employee *-- ProfileId
+}
+@enduml

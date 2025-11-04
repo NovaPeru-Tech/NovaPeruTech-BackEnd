@@ -1,0 +1,453 @@
+@startuml
+package "payments Bounded Context" {
+
+    package "domain" {
+        package "exceptions" {
+            class AccountNotFoundException<<exception>> {
+                +AccountNotFoundException(Long)
+                +AccountNotFoundException(String)
+            }
+
+            class PlanNotFoundException<<exception>> {
+                +PlanNotFoundException(Long)
+                +PlanNotFoundException(String)
+            }
+
+            class SubscriptionNotFoundException<<exception>> {
+                +SubscriptionNotFoundException(Long)
+                +SubscriptionNotFoundException(String)
+            }
+        }
+
+        package "model" {
+            package "aggregates" {
+                class Account <<aggregate>> {
+                    -Long id
+                    -BusinessName businessName
+                    -String email
+                    -AccountStatus status
+                    -LocalDateTime createdAt
+                    -LocalDateTime updatedAt
+                    +Account()
+                    +Account(CreateAccountCommand)
+                    +activate(): void
+                    +deactivate(): void
+                }
+
+                class Subscription<<aggregate>> {
+                    -Long id
+                    -Account account
+                    -Plan plan
+                    -SubscriptionStatus status
+                    -LocalDateTime startDate
+                    -LocalDateTime endDate
+                    -BillingCycle billingCycle
+                    -BigDecimal price
+                    -String stripeSubscriptionId
+                    +Subscription()
+                    +Subscription(Account, Plan, BillingCycle)
+                    +complete(): void
+                    +upgrade(Plan): void
+                    +cancel(): void
+                }
+            }
+
+            package "commands" {
+                class CompleteSubscriptionCommand<<record>> {
+                    +Long subscriptionId
+                    +String stripeSessionId
+                }
+
+                class CompleteUpgradeCommand<<record>> {
+                    +Long subscriptionId
+                    +String stripeSessionId
+                }
+
+                class CreateAccountCommand<<record>> {
+                    +String businessName
+                    +String email
+                    +Long userId
+                }
+
+                class SeedPlanCommand<<record>> {
+                    +String name
+                    +String type
+                    +String description
+                    +BigDecimal monthlyPrice
+                    +BigDecimal annualPrice
+                    +Integer maxUsers
+                    +Integer maxResidents
+                    +List<String> features
+                }
+
+                class UpgradeSubscriptionCommand<<record>> {
+                    +Long accountId
+                    +String planType
+                    +String billingCycle
+                }
+            }
+
+            package "queries" {
+                class GetAllPlansQuery<<record>> {
+                }
+
+                class GetPlanTypeByAccountIdQuery<<record>> {
+                    +Long accountId
+                }
+
+                class GetSubscriptionByAccountIdQuery<<record>> {
+                    +Long accountId
+                }
+            }
+
+            package "valueobjects" {
+                class AccountStatus <<enum>> {
+                    ACTIVE
+                    INACTIVE
+                }
+
+                class PlanType<<enum>> {
+                    FAMILIAR
+                    NURSING_HOME
+                }
+
+                class SubscriptionStatus<<enum>> {
+                    PENDING
+                    COMPLETED
+                }
+
+                class BusinessName<<record>> {
+                    +String businessName
+                }
+
+                class BillingCycle<<enum>> {
+                    MONTHLY
+                    ANNUAL
+                }
+            }
+
+            package "entities" {
+                class Plan {
+                    -Long id
+                    -String name
+                    -PlanType type
+                    -String description
+                    -BigDecimal monthlyPrice
+                    -BigDecimal annualPrice
+                    -Integer maxUsers
+                    -Integer maxResidents
+                    -List<String> features
+                    -Boolean isActive
+                    +Plan()
+                    +Plan(SeedPlanCommand)
+                    +getDiscountedAnnualPrice(): BigDecimal
+                }
+            }
+
+            package "events" {
+            }
+        }
+
+        package "services" {
+            interface AccountCommandService {
+                +handle(CreateAccountCommand): Optional<Account>
+            }
+
+            interface AccountQueryService {
+                +handle(Query): Optional<Account>
+            }
+
+            interface PlanCommandService {
+                +handle(SeedPlanCommand): Optional<Plan>
+            }
+
+            interface PlanQueryService {
+                +handle(GetAllPlansQuery): List<Plan>
+                +handle(GetPlanTypeByAccountIdQuery): Optional<PlanType>
+            }
+
+            interface SubscriptionCommandService {
+                +handle(UpgradeSubscriptionCommand): String
+                +handle(CompleteSubscriptionCommand): Optional<Subscription>
+                +handle(CompleteUpgradeCommand): Optional<Subscription>
+            }
+
+            interface SubscriptionQueryService {
+                +handle(GetSubscriptionByAccountIdQuery): Optional<Subscription>
+            }
+        }
+    }
+
+    package "application" {
+        package "internal" {
+            package "outboundservices.acl" {
+                class ExternalAuthenticationService<<service>> {
+                    -RestTemplate restTemplate
+                    -String authServiceUrl
+                    +validateUser(Long): boolean
+                    +getUserEmail(Long): String
+                }
+
+                class PaymentService<<service>> {
+                    -Stripe stripe
+                    -String stripeApiKey
+                    -String successUrl
+                    -String cancelUrl
+                    +createCheckoutSession(Account, Plan, BillingCycle): String
+                    +cancelSubscription(String): void
+                    +retrieveSession(String): Session
+                }
+            }
+
+            package "commandservices" {
+                class AccountCommandServiceImpl {
+                    -AccountRepository accountRepository
+                    -ExternalAuthenticationService authService
+                    +handle(CreateAccountCommand): Optional<Account>
+                }
+
+                class PlanCommandServiceImpl {
+                    -PlanRepository planRepository
+                    +handle(SeedPlanCommand): Optional<Plan>
+                    +seedDefaultPlans(): void
+                }
+
+                class SubscriptionCommandServiceImpl {
+                    -SubscriptionRepository subscriptionRepository
+                    -AccountRepository accountRepository
+                    -PlanRepository planRepository
+                    -PaymentService paymentService
+                    +handle(UpgradeSubscriptionCommand): String
+                    +handle(CompleteSubscriptionCommand): Optional<Subscription>
+                    +handle(CompleteUpgradeCommand): Optional<Subscription>
+                }
+            }
+
+            package "queryservices" {
+                class AccountQueryServiceImpl {
+                    -AccountRepository accountRepository
+                    +handle(Query): Optional<Account>
+                }
+
+                class PlanQueryServiceImpl {
+                    -PlanRepository planRepository
+                    +handle(GetAllPlansQuery): List<Plan>
+                    +handle(GetPlanTypeByAccountIdQuery): Optional<PlanType>
+                }
+
+                class SubscriptionQueryServiceImpl {
+                    -SubscriptionRepository subscriptionRepository
+                    +handle(GetSubscriptionByAccountIdQuery): Optional<Subscription>
+                }
+            }
+
+            package "eventhandlers" {
+            }
+        }
+    }
+
+    package "infrastructure" {
+        package "persistence.jpa.repositories" {
+            interface AccountRepository<<interface>> {
+                +findByBusinessName(BusinessName): Optional<Account>
+                +existsByBusinessName(BusinessName): boolean
+                +findById(Long): Optional<Account>
+                +save(Account): Account
+            }
+
+            interface PlanRepository<<interface>> {
+                +findByType(PlanType): Optional<Plan>
+                +findAll(): List<Plan>
+                +save(Plan): Plan
+            }
+
+            interface SubscriptionRepository<<interface>> {
+                +findByAccountId(Long): List<Subscription>
+                +findActiveByAccount(Account): Optional<Subscription>
+                +save(Subscription): Subscription
+            }
+        }
+
+        package "payment.stripe.configuration" {
+        }
+    }
+
+    package "interfaces.rest" {
+        package "resources" {
+            class PlanResource<<record>> {
+                +Long id
+                +String name
+                +String type
+                +String description
+                +BigDecimal monthlyPrice
+                +BigDecimal annualPrice
+                +List<String> features
+            }
+
+            class UpgradeSubscriptionResource<<record>> {
+                +Long accountId
+                +String planType
+                +String billingCycle
+            }
+
+            class CreateAccountResource<<record>> {
+                +String businessName
+                +String email
+                +Long userId
+            }
+
+            class AccountResource<<record>> {
+                +Long id
+                +String businessName
+                +String email
+                +String status
+            }
+        }
+
+        package "transform" {
+            class AccountResourceFromEntityAssembler {
+                +{static} toResourceFromEntity(Account): AccountResource
+            }
+
+            class UpgradeSubscriptionCommandFromResourceAssembler {
+                +{static} toCommandFromResource(UpgradeSubscriptionResource): UpgradeSubscriptionCommand
+            }
+
+            class PlansResourceFromEntityAssembler {
+                +{static} toResourceFromEntity(Plan): PlanResource
+                +{static} toResourceListFromEntityList(List<Plan>): List<PlanResource>
+            }
+
+            class CreateAccountCommandFromResourceAssembler {
+                +{static} toCommandFromResource(CreateAccountResource): CreateAccountCommand
+            }
+        }
+
+        class AccountsController {
+            -AccountCommandService accountCommandService
+            -AccountQueryService accountQueryService
+            +createAccount(CreateAccountResource): ResponseEntity<AccountResource>
+            +getAccount(Long): ResponseEntity<AccountResource>
+        }
+
+        class PlansController {
+            -PlanQueryService planQueryService
+            -PlanCommandService planCommandService
+            +getAllPlans(): ResponseEntity<List<PlanResource>>
+            +seedPlans(): ResponseEntity<String>
+        }
+
+        class SubscriptionsController {
+            -SubscriptionCommandService subscriptionCommandService
+            -SubscriptionQueryService subscriptionQueryService
+            +upgradeSubscription(UpgradeSubscriptionResource): ResponseEntity<String>
+            +completeSubscription(String): ResponseEntity<Void>
+            +getSubscription(Long): ResponseEntity<Subscription>
+        }
+    }
+
+    package "interfaces.acl" {
+    }
+}
+
+' ==========================================
+' RELATIONSHIPS - AGGREGATES
+' ==========================================
+
+Account *-- BusinessName
+Account *-- AccountStatus
+Subscription --> Account
+Subscription --> Plan
+Subscription *-- SubscriptionStatus
+Subscription *-- BillingCycle
+Plan *-- PlanType
+
+' ==========================================
+' RELATIONSHIPS - COMMANDS
+' ==========================================
+
+Account ..> CreateAccountCommand : creates from
+Subscription ..> UpgradeSubscriptionCommand : creates from
+Plan ..> SeedPlanCommand : creates from
+
+' ==========================================
+' RELATIONSHIPS - COMMAND SERVICES
+' ==========================================
+
+AccountCommandServiceImpl ..|> AccountCommandService
+AccountCommandServiceImpl --> AccountRepository
+AccountCommandServiceImpl --> ExternalAuthenticationService
+AccountCommandServiceImpl ..> CreateAccountCommand : handles
+
+PlanCommandServiceImpl ..|> PlanCommandService
+PlanCommandServiceImpl --> PlanRepository
+PlanCommandServiceImpl ..> SeedPlanCommand : handles
+
+SubscriptionCommandServiceImpl ..|> SubscriptionCommandService
+SubscriptionCommandServiceImpl --> SubscriptionRepository
+SubscriptionCommandServiceImpl --> AccountRepository
+SubscriptionCommandServiceImpl --> PlanRepository
+SubscriptionCommandServiceImpl --> PaymentService
+SubscriptionCommandServiceImpl ..> UpgradeSubscriptionCommand : handles
+SubscriptionCommandServiceImpl ..> CompleteSubscriptionCommand : handles
+SubscriptionCommandServiceImpl ..> CompleteUpgradeCommand : handles
+
+' ==========================================
+' RELATIONSHIPS - QUERY SERVICES
+' ==========================================
+
+AccountQueryServiceImpl ..|> AccountQueryService
+AccountQueryServiceImpl --> AccountRepository
+
+PlanQueryServiceImpl ..|> PlanQueryService
+PlanQueryServiceImpl --> PlanRepository
+PlanQueryServiceImpl ..> GetAllPlansQuery : handles
+PlanQueryServiceImpl ..> GetPlanTypeByAccountIdQuery : handles
+
+SubscriptionQueryServiceImpl ..|> SubscriptionQueryService
+SubscriptionQueryServiceImpl --> SubscriptionRepository
+SubscriptionQueryServiceImpl ..> GetSubscriptionByAccountIdQuery : handles
+
+' ==========================================
+' RELATIONSHIPS - CONTROLLERS
+' ==========================================
+
+AccountsController --> AccountCommandService
+AccountsController --> AccountQueryService
+AccountsController ..> CreateAccountResource : receives
+AccountsController ..> AccountResource : returns
+
+PlansController --> PlanQueryService
+PlansController --> PlanCommandService
+PlansController ..> PlanResource : returns
+
+SubscriptionsController --> SubscriptionCommandService
+SubscriptionsController --> SubscriptionQueryService
+SubscriptionsController ..> UpgradeSubscriptionResource : receives
+
+' ==========================================
+' RELATIONSHIPS - ASSEMBLERS
+' ==========================================
+
+CreateAccountCommandFromResourceAssembler ..> CreateAccountResource : transforms
+CreateAccountCommandFromResourceAssembler ..> CreateAccountCommand : creates
+
+AccountResourceFromEntityAssembler ..> Account : transforms
+AccountResourceFromEntityAssembler ..> AccountResource : creates
+
+PlansResourceFromEntityAssembler ..> Plan : transforms
+PlansResourceFromEntityAssembler ..> PlanResource : creates
+
+UpgradeSubscriptionCommandFromResourceAssembler ..> UpgradeSubscriptionResource : transforms
+UpgradeSubscriptionCommandFromResourceAssembler ..> UpgradeSubscriptionCommand : creates
+
+' ==========================================
+' RELATIONSHIPS - CONTROLLERS USE ASSEMBLERS
+' ==========================================
+
+AccountsController ..> CreateAccountCommandFromResourceAssembler : uses
+AccountsController ..> AccountResourceFromEntityAssembler : uses
+PlansController ..> PlansResourceFromEntityAssembler : uses
+SubscriptionsController ..> UpgradeSubscriptionCommandFromResourceAssembler : uses
+
+@enduml

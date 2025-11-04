@@ -1,0 +1,32 @@
+@startuml
+package "shared bounden context" {
+  package "interfaces" {
+    package "rest" {
+      class MessageResource {
+        +message: String
+      }
+    }
+  }
+  package "domain" {
+    package "model" {
+     package "aggregates"{
+      class "AuditableAbstractAggregateRoot"{
+     }
+     }
+        package "entities"{
+        class "AuditableModel"{
+        }
+        }
+    }
+  }
+  package "infrastructure.documentation.openapi.configuration"{
+   class "OpenApiConfiguration"{
+   }
+  }
+  package "infrastructure.persistence.jpa.configuration.strategy"{
+  class "SnakeCaseWithPluralizedTablePhysicalNamingStrategy"{
+  }
+  }
+}
+
+@enduml
