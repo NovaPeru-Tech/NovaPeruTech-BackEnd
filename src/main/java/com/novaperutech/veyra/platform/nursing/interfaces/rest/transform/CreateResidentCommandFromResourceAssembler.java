@@ -1,0 +1,16 @@
+package com.novaperutech.veyra.platform.nursing.interfaces.rest.transform;
+
+import com.novaperutech.veyra.platform.nursing.domain.model.commands.CreateResidentCommand;
+import com.novaperutech.veyra.platform.nursing.interfaces.rest.resources.CreateResidentResource;
+
+public class CreateResidentCommandFromResourceAssembler {
+    public static CreateResidentCommand toCommandFromResource(CreateResidentResource resource)
+    {
+      return new CreateResidentCommand(resource.dni(),resource.firstName(),resource.lastName(),resource.birthDate(),
+       resource.Age(),resource.emailAddress(),resource.street(),resource.number(),resource.city(),resource.postalCode(),
+              resource.country(),resource.photo(),resource.phoneNumber()
+              ,resource.legalRepresentativeFirstName(),resource.legalRepresentativeLastName(),resource.legalRepresentativePhoneNumber(),
+              resource.emergencyContactFirstName(),resource.emergencyContactLastName(),resource.emergencyContactPhoneNumber()
+      ) ;
+    }
+}
