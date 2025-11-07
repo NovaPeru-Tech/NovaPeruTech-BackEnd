@@ -32,19 +32,23 @@ public abstract class Profile extends AuditableAbstractAggregateRoot<Profile> {
         this.streetAddress = new StreetAddress(street, number, city, postalCode, country);
         this.photo = new Photo (photo);
     }
-    public void updateEmail(EmailAddress newEmail) {
-        this.emailAddress = newEmail;
+    public void updateEmail(String newEmail) {
+        this.emailAddress = new EmailAddress(newEmail);
     }
 
-    public void updateAddress(StreetAddress newAddress) {
-        this.streetAddress = newAddress;
+    public void updateAddress(String street,
+                              String number,
+                              String city,
+                              String postalCode,
+                              String country) {
+        this.streetAddress = new StreetAddress( street, number, city, postalCode, country);
     }
 
-    public void updatePhoto(Photo newPhoto) {
-        this.photo = newPhoto;
+    public void updatePhoto(String newPhoto) {
+        this.photo = new Photo(newPhoto);
     }
-    public void updatePhoneNumber(PhoneNumber newPhoneNumber) {
-        this.phoneNumber = newPhoneNumber;
+    public void updatePhoneNumber(String newPhoneNumber) {
+        this.phoneNumber = new PhoneNumber( newPhoneNumber);
     }
 
 }

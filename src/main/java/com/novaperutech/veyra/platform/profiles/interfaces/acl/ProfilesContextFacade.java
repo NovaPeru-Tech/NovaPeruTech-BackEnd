@@ -10,5 +10,10 @@ public interface ProfilesContextFacade {
                              String country, String photo, String phoneNumber);
 
     Long fetchPersonProfileIdByDni(String dni);
-
+    Long updatePersonProfile(Long id,String dni, String firstName, String lastName, LocalDate birthDate, Integer Age, String emailAddress, String street,
+                             String number,
+                             String city,
+                             String postalCode,
+                             String country, String photo, String phoneNumber);
+    void  deletePersonProfile(Long id);
 }
