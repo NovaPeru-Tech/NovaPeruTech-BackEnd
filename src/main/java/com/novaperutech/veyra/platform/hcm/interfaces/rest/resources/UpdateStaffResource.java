@@ -1,0 +1,15 @@
+package com.novaperutech.veyra.platform.hcm.interfaces.rest.resources;
+
+import java.time.LocalDate;
+
+public record UpdateStaffResource(String dni, String firstName, String lastName,
+                                  LocalDate birthDate, Integer Age, String emailAddress, String street,
+                                  String number,
+                                  String city,
+                                  String postalCode,
+                                  String country,
+                                  String photo, String phoneNumber
+        , String emergencyContactFirstName,
+                                  String emergencyContactLastName,
+                                  String emergencyContactPhoneNumber) {
+}
