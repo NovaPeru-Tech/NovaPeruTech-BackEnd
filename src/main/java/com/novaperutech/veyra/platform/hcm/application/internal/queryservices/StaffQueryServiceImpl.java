@@ -1,8 +1,8 @@
 package com.novaperutech.veyra.platform.hcm.application.internal.queryservices;
 
 import com.novaperutech.veyra.platform.hcm.domain.model.aggregates.Staff;
-import com.novaperutech.veyra.platform.hcm.domain.model.queries.GetAllStaffQuery;
-import com.novaperutech.veyra.platform.hcm.domain.model.queries.GetStaffByIdQuery;
+import com.novaperutech.veyra.platform.hcm.domain.model.entities.Contract;
+import com.novaperutech.veyra.platform.hcm.domain.model.queries.*;
 import com.novaperutech.veyra.platform.hcm.domain.services.StaffQueryServices;
 import com.novaperutech.veyra.platform.hcm.infrastructure.persistence.jpa.repositories.StaffRepository;
 import org.springframework.stereotype.Service;
@@ -26,4 +26,42 @@ public class StaffQueryServiceImpl implements StaffQueryServices {
     public List<Staff> handle(GetAllStaffQuery query) {
         return staffRepository.findAll();
     }
+
+    @Override
+    public Optional<Contract> handle(GetActiveContractByStaffMemberId query) {
+        Staff staff = staffRepository.findById(query.staffId())
+                .orElseThrow(() -> new IllegalArgumentException("Staff with id " + query.staffId() + " does not exist"));
+
+        Long activeContractId = staff.getContractHistory().getActiveContractId();
+
+        if (activeContractId == null) {
+            return Optional.empty();
+        }
+        return staff.getContractHistory().getAllContracts().stream()
+                .filter(contract -> contract.getId().equals(activeContractId))
+                .findFirst();
+    }
+
+    @Override
+    public List<Contract> handle(GetAllContractsByStaffMemberId query) {
+        Staff staff = staffRepository.findById(query.staffId())
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Staff with id " + query.staffId() + " does not exist"
+                ));
+
+        return staff.getContractHistory().getAllContracts();
+    }
+
+    @Override
+    public Optional<Contract> handle(GetContractByStaffMemberIdAndContractId query) {
+        Staff staff = staffRepository.findById(query.staffMemberId())
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Staff with id " + query.staffMemberId() + " does not exist"
+                ));
+
+        return staff.getContractHistory().getContractById(query.contractId());
+    }
+
+
+
 }

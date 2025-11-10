@@ -2,9 +2,7 @@ package com.novaperutech.veyra.platform.hcm.application.internal.commandservices
 
 import com.novaperutech.veyra.platform.hcm.application.internal.outboundservices.acl.ExternalProfileService;
 import com.novaperutech.veyra.platform.hcm.domain.model.aggregates.Staff;
-import com.novaperutech.veyra.platform.hcm.domain.model.commands.CreateStaffCommand;
-import com.novaperutech.veyra.platform.hcm.domain.model.commands.DeleteStaffCommand;
-import com.novaperutech.veyra.platform.hcm.domain.model.commands.UpdateStaffCommand;
+import com.novaperutech.veyra.platform.hcm.domain.model.commands.*;
 import com.novaperutech.veyra.platform.hcm.domain.model.valueobjetcs.EmergencyContact;
 import com.novaperutech.veyra.platform.hcm.domain.services.StaffCommandServices;
 import com.novaperutech.veyra.platform.hcm.infrastructure.persistence.jpa.repositories.StaffRepository;
@@ -67,5 +65,38 @@ public class StaffCommandServiceImpl implements StaffCommandServices {
     @Override
     public void handle(DeleteStaffCommand command) {
 
+    }
+
+    @Override
+    public Long handle(AddContractToStaffCommand command) {
+        if (!staffRepository.existsById(command.staffId())){
+            throw new IllegalArgumentException("Staff with id %s not found ".formatted(command.staffId()));
+        }
+        else {
+            try {
+                Staff staff = staffRepository.findById(command.staffId())
+                        .orElseThrow(() -> new IllegalArgumentException("Staff with id %s not found".formatted(command.staffId())));
+                staff.addContractToHistory(command.startDate(),command.endDate(),command.typeOfContract()
+                        ,command.staffRole(),command.workShift());
+                staffRepository.save(staff);
+                return staff.getId();
+            } catch (Exception e){
+                throw new IllegalArgumentException("Error while adding contract to staff: %s".formatted(e.getMessage()));
+            }
+        }
+    }
+
+    @Override
+    public void handle(UpdateContractStatusCommand command) {
+        try {
+            Staff staff = staffRepository.findById(command.staffMemberId())
+                    .orElseThrow(() -> new IllegalArgumentException("Staff with id %s not found".formatted(command.staffMemberId())));
+            staff.updateContractStatus(command.contractId(), command.newStatus());
+            staffRepository.save(staff);
+        } catch (IllegalArgumentException e){
+            throw e;
+        } catch (Exception e){
+            throw new IllegalArgumentException("Error while updating contract status: %s".formatted(e.getMessage()));
+        }
     }
 }
