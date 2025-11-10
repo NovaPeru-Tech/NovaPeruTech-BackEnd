@@ -11,10 +11,10 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 @Service
-public class ResidentQueryCommandImpl implements ResidentQueryServices {
+public class ResidentQueryServiceImpl implements ResidentQueryServices {
     private final ResidentRepository residentRepository;
 
-    public ResidentQueryCommandImpl(ResidentRepository residentRepository) {
+    public ResidentQueryServiceImpl(ResidentRepository residentRepository) {
         this.residentRepository = residentRepository;
     }
 
