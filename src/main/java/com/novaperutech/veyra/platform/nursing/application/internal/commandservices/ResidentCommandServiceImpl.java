@@ -59,7 +59,7 @@ public class ResidentCommandServiceImpl implements ResidentCommandServices {
 
         try {
             externalProfileService.updatePersonProfile(
-                    command.id(), command.dni(), command.firstName(), command.lastName(),
+                     residentUpdate.getPersonProfileId().personProfileId(),command.dni(), command.firstName(), command.lastName(),
                     command.birthDate(), command.Age(), command.emailAddress(), command.street(),
                     command.number(), command.city(), command.postalCode(), command.country(),
                     command.photo(), command.phoneNumber()
