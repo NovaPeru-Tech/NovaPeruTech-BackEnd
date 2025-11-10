@@ -16,4 +16,15 @@ public interface ProfilesContextFacade {
                              String postalCode,
                              String country, String photo, String phoneNumber);
     void  deletePersonProfile(Long id);
+    Long createBusinessProfile(String businessName,
+                               String emailAddress,
+                               String phoneNumber,
+                               String street,
+                               String number,
+                               String city,
+                               String postalCode,
+                               String country,
+                               String photoUrl,
+                               String ruc );
+    Long fetchBusinessProfileIdByRuc(String ruc);
 }
