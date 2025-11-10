@@ -1,5 +1,6 @@
 package com.novaperutech.veyra.platform.nursing.application.internal.outboundservices.acl;
 
+import com.novaperutech.veyra.platform.nursing.domain.model.valueobjetcs.BusinessProfileId;
 import com.novaperutech.veyra.platform.nursing.domain.model.valueobjetcs.PersonProfileId;
 import com.novaperutech.veyra.platform.profiles.interfaces.acl.ProfilesContextFacade;
 import org.springframework.stereotype.Service;
@@ -29,6 +30,27 @@ public class ExternalProfileService {
         ,emailAddress,street,number,city,postalCode,country,photo,phoneNumber);
         return personProfileId==0L?Optional.empty():Optional.of(new PersonProfileId(personProfileId));
     }
+    public Optional<BusinessProfileId>fetchBusinessProfileByRuc(String ruc){
+        var businessProfileId=profilesContextFacade.fetchBusinessProfileIdByRuc(ruc);
+        return businessProfileId==0L?Optional.empty():Optional.of(new BusinessProfileId(businessProfileId));
+    }
+
+    public Optional<BusinessProfileId>createBusinessProfile(String businessName,
+                                                            String emailAddress,
+                                                            String phoneNumber,
+                                                            String street,
+                                                            String number,
+                                                            String city,
+                                                            String postalCode,
+                                                            String country,
+                                                            String photoUrl,
+                                                            String ruc )
+    {
+        var businessProfileId=profilesContextFacade.createBusinessProfile(businessName,emailAddress,phoneNumber,street,number,city,postalCode,country,photoUrl, ruc);
+        return businessProfileId==0L?Optional.empty():Optional.of(new BusinessProfileId(businessProfileId));
+
+    }
+
     public void updatePersonProfile(Long id, String dni, String firstName, String lastName, LocalDate birthDate, Integer Age, String emailAddress, String street,
                                     String number,
                                     String city,
