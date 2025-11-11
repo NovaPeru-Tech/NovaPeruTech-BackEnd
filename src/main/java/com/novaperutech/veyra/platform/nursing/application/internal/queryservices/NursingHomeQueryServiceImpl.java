@@ -2,7 +2,7 @@ package com.novaperutech.veyra.platform.nursing.application.internal.queryservic
 
 import com.novaperutech.veyra.platform.nursing.domain.model.aggregates.NursingHome;
 import com.novaperutech.veyra.platform.nursing.domain.model.queries.GetAllNursingHomeQuery;
-import com.novaperutech.veyra.platform.nursing.domain.model.queries.GetNursingHomeByBusinessProfileIdQuery;
+import com.novaperutech.veyra.platform.nursing.domain.model.queries.GetNursingHomeByIdQuery;
 import com.novaperutech.veyra.platform.nursing.domain.services.NursingHomeQueryServices;
 import com.novaperutech.veyra.platform.nursing.infrastructure.persistence.jpa.repositories.NursingHomeRepository;
 import org.springframework.stereotype.Service;
@@ -20,8 +20,8 @@ private final NursingHomeRepository nursingHomeRepository;
     }
 
     @Override
-    public Optional<NursingHome> handle(GetNursingHomeByBusinessProfileIdQuery query) {
-        return nursingHomeRepository.findByBusinessProfileId(query.businessProfileId());
+    public Optional<NursingHome> handle(GetNursingHomeByIdQuery query) {
+        return nursingHomeRepository.findById(query.id());
     }
 
     @Override

@@ -1,4 +1,4 @@
-package com.novaperutech.veyra.platform.nursing.domain.model.valueobjetcs;
+package com.novaperutech.veyra.platform.nursing.domain.model.valueobjects;
 
 import jakarta.persistence.Embeddable;
 

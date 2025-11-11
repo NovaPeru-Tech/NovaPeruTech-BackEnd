@@ -1,8 +1,7 @@
 package com.novaperutech.veyra.platform.nursing.interfaces.rest;
 
 import com.novaperutech.veyra.platform.nursing.domain.model.queries.GetAllNursingHomeQuery;
-import com.novaperutech.veyra.platform.nursing.domain.model.queries.GetNursingHomeByBusinessProfileIdQuery;
-import com.novaperutech.veyra.platform.nursing.domain.model.valueobjetcs.BusinessProfileId;
+import com.novaperutech.veyra.platform.nursing.domain.model.queries.GetNursingHomeByIdQuery;
 import com.novaperutech.veyra.platform.nursing.domain.services.NursingHomeCommandServices;
 import com.novaperutech.veyra.platform.nursing.domain.services.NursingHomeQueryServices;
 import com.novaperutech.veyra.platform.nursing.interfaces.rest.resources.CreateNursingHomeResource;
@@ -23,7 +22,7 @@ import java.util.List;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
-@RequestMapping(value = "/api/v1/nursing-home",produces = APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/api/v1/nursing-homes",produces = APPLICATION_JSON_VALUE)
 @Tag(name = "Nursing homes",description = "Available nursing home Endpoints")
 public class NursingHomesController {
     private final NursingHomeCommandServices nursingHomeCommandServices;
@@ -46,46 +45,49 @@ public class NursingHomesController {
         var createNursingHomeCommand= CreateNursingHomeCommandFromResourceAssembler.toCommandFromResource(resource);
         var nursingHomeId=nursingHomeCommandServices.handle(createNursingHomeCommand);
         if (nursingHomeId==null||nursingHomeId==0L){return ResponseEntity.badRequest().build();}
-        var aux= new BusinessProfileId(nursingHomeId);
-        var getNursingHomeByBusinessProfileId= new GetNursingHomeByBusinessProfileIdQuery(aux);
-       var nursingHome= nursingHomeQueryServices.handle(getNursingHomeByBusinessProfileId);
+        var getNursingHomeByIdQuery= new GetNursingHomeByIdQuery(nursingHomeId);
+       var nursingHome= nursingHomeQueryServices.handle(getNursingHomeByIdQuery);
        if (nursingHome.isEmpty()){return ResponseEntity.notFound().build();}
        var nursingHomeEntity= nursingHome.get();
-       var nursingHomeResource= NursingHomeFromEntityAssembler.toEntityFromResource(nursingHomeEntity);
+       var nursingHomeResource= NursingHomeFromEntityAssembler.toResourceFromEntity(nursingHomeEntity);
        return new ResponseEntity<>(nursingHomeResource, HttpStatus.CREATED);
     }
-    @GetMapping("/{businessProfileId}")
+    @GetMapping("/{nursingHomeId}")
     @Operation(
-            summary = "Get Nursing Home by Business Profile ID",
-            description = "Retrieves the Nursing Home associated with the given Business Profile ID. Returns 404 if no Nursing Home is found for the provided ID."
-    )
+            summary = "Get Nursing Home by ID",
+            description = "Retrieves the Nursing Home by its unique identifier. Returns 404 if not found."    )
     @Parameter(
-            name = "businessProfileId",
-            description = "The unique identifier of the Business Profile for which to fetch the associated Nursing Home",
+            name = "nursingHomeId",
+            description = "The unique identifier for which to fetch the associated Nursing Home",
             required = true
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved the Nursing Home details"),
             @ApiResponse(responseCode = "404", description = "Nursing home not found"),
     })
-    public ResponseEntity<NursingHomeResource>getNursingHomeByBusinessProfileId(@PathVariable Long businessProfileId)
+    public ResponseEntity<NursingHomeResource>getNursingHomeById(@PathVariable Long nursingHomeId)
     {
-        var aux= new BusinessProfileId(businessProfileId);
-        var businessProfileQuery= nursingHomeQueryServices.handle(new GetNursingHomeByBusinessProfileIdQuery(aux));
-        if(businessProfileQuery.isEmpty()){return ResponseEntity.notFound().build();}
-        var businessResource= NursingHomeFromEntityAssembler.toEntityFromResource(businessProfileQuery.get());
-        return ResponseEntity.ok(businessResource);
+        var getNursingHomeByIdQuery= new GetNursingHomeByIdQuery(nursingHomeId);
+        var nursingHome= nursingHomeQueryServices.handle(getNursingHomeByIdQuery);
+        if (nursingHome.isEmpty()){return ResponseEntity.notFound().build();}
+        var nursingHomeEntity= nursingHome.get();
+        var nursingHomeResource= NursingHomeFromEntityAssembler.toResourceFromEntity(nursingHomeEntity);
+        return ResponseEntity.ok(nursingHomeResource);
     }
      @GetMapping
-     @Operation(summary = "",description = "")
-     @ApiResponses(value =
-             {@ApiResponse()
-             ,@ApiResponse()})
+     @Operation(
+             summary = "Get all nursing homes",
+             description = "Retrieves a list of all registered nursing homes"
+     )
+     @ApiResponses(value = {
+             @ApiResponse(responseCode = "200", description = "Successfully retrieved all nursing homes"),
+             @ApiResponse(responseCode = "404", description = "No nursing homes found")
+     })
     public ResponseEntity<List<NursingHomeResource>>getAllNursingHomes()
      {
          var nursingHome= nursingHomeQueryServices.handle(new GetAllNursingHomeQuery());
          if (nursingHome.isEmpty()){return ResponseEntity.notFound().build();}
-         var nursingHomeResource=nursingHome.stream().map(NursingHomeFromEntityAssembler::toEntityFromResource).toList();
+         var nursingHomeResource=nursingHome.stream().map(NursingHomeFromEntityAssembler::toResourceFromEntity).toList();
          return ResponseEntity.ok(nursingHomeResource);
      }
 

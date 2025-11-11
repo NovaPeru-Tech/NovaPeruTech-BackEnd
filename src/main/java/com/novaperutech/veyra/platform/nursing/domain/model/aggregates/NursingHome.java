@@ -1,6 +1,6 @@
 package com.novaperutech.veyra.platform.nursing.domain.model.aggregates;
 
-import com.novaperutech.veyra.platform.nursing.domain.model.valueobjetcs.BusinessProfileId;
+import com.novaperutech.veyra.platform.nursing.domain.model.valueobjects.BusinessProfileId;
 import com.novaperutech.veyra.platform.shared.domain.model.aggregates.AuditableAbstractAggregateRoot;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
