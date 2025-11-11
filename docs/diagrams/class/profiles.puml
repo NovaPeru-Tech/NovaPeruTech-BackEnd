@@ -1,5 +1,5 @@
 @startuml
-title Profiles BC - Detallado (vertical)
+title Profiles Bounded Context
 top to bottom direction
 skinparam packageStyle Rectangle
 skinparam linetype ortho
