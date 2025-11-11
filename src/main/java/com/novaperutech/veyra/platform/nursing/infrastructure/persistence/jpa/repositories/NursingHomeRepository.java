@@ -1,7 +1,7 @@
 package com.novaperutech.veyra.platform.nursing.infrastructure.persistence.jpa.repositories;
 
 import com.novaperutech.veyra.platform.nursing.domain.model.aggregates.NursingHome;
-import com.novaperutech.veyra.platform.nursing.domain.model.valueobjetcs.BusinessProfileId;
+import com.novaperutech.veyra.platform.nursing.domain.model.valueobjects.BusinessProfileId;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
