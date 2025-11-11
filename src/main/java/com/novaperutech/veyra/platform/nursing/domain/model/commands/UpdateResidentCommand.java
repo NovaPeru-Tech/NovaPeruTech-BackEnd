@@ -16,8 +16,8 @@ public record UpdateResidentCommand(Long id, String dni,String firstName, String
                                     String emergencyContactPhoneNumber) {
 
     public UpdateResidentCommand{
-        if(id==null){
-              throw  new IllegalArgumentException(" Cannot is null");
+        if(id==null) {
+            throw new IllegalArgumentException(" Cannot is null");
         }
         if (legalRepresentativeFirstName==null|| legalRepresentativeFirstName.isBlank()){
            throw new IllegalArgumentException("");
@@ -30,10 +30,3 @@ public record UpdateResidentCommand(Long id, String dni,String firstName, String
         if (emergencyContactPhoneNumber==null|| emergencyContactPhoneNumber.isBlank()){throw new IllegalArgumentException("");}
     }
 }
-/* String firstName, String lastName,
-                                    LocalDate birthDate, Integer Age, String emailAddress, String street,
-                                    String number,
-                                    String city,
-                                    String postalCode,
-                                    String country,
-                                    String photo, String phoneNumber,*/

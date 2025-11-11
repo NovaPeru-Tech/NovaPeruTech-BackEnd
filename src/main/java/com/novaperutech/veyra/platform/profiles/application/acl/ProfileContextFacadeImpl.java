@@ -1,10 +1,15 @@
 package com.novaperutech.veyra.platform.profiles.application.acl;
 
+import com.novaperutech.veyra.platform.profiles.domain.model.commands.CreateBusinessProfileCommand;
 import com.novaperutech.veyra.platform.profiles.domain.model.commands.CreatePersonProfileCommand;
 import com.novaperutech.veyra.platform.profiles.domain.model.commands.DeletePersonProfileCommand;
 import com.novaperutech.veyra.platform.profiles.domain.model.commands.UpdatePersonProfileCommand;
+import com.novaperutech.veyra.platform.profiles.domain.model.queries.GetBusinessProfileByRucQuery;
 import com.novaperutech.veyra.platform.profiles.domain.model.queries.GetPersonProfileByDniQuery;
 import com.novaperutech.veyra.platform.profiles.domain.model.valueobjects.Dni;
+import com.novaperutech.veyra.platform.profiles.domain.model.valueobjects.Ruc;
+import com.novaperutech.veyra.platform.profiles.domain.services.BusinessProfileCommandService;
+import com.novaperutech.veyra.platform.profiles.domain.services.BusinessProfileQueryService;
 import com.novaperutech.veyra.platform.profiles.domain.services.PersonProfileCommandService;
 import com.novaperutech.veyra.platform.profiles.domain.services.PersonProfileQueryService;
 import com.novaperutech.veyra.platform.profiles.interfaces.acl.ProfilesContextFacade;
@@ -16,11 +21,14 @@ import java.time.LocalDate;
 public class ProfileContextFacadeImpl implements ProfilesContextFacade {
     private final PersonProfileCommandService personProfileCommandService;
     private final PersonProfileQueryService personProfileQueryService;
+    private final BusinessProfileCommandService businessProfileCommandService;
+private final BusinessProfileQueryService businessProfileQueryService;
 
-
-    public ProfileContextFacadeImpl(PersonProfileCommandService personProfileCommandService, PersonProfileQueryService personProfileQueryService) {
+    public ProfileContextFacadeImpl(PersonProfileCommandService personProfileCommandService, PersonProfileQueryService personProfileQueryService, BusinessProfileCommandService businessProfileCommandService, BusinessProfileQueryService businessProfileQueryService) {
         this.personProfileCommandService = personProfileCommandService;
         this.personProfileQueryService = personProfileQueryService;
+        this.businessProfileCommandService = businessProfileCommandService;
+        this.businessProfileQueryService = businessProfileQueryService;
     }
 
     @Override
@@ -28,10 +36,24 @@ public class ProfileContextFacadeImpl implements ProfilesContextFacade {
                                     LocalDate birthDate, Integer Age, String emailAddress,String street, String number,
                                     String city, String postalCode,String country, String photo, String phoneNumber) {
         var createPersonProfileCommand=
-                new CreatePersonProfileCommand
+                new
+                        CreatePersonProfileCommand
                         (dni,firstName,lastName,birthDate,Age,emailAddress,street,number,city,postalCode,country,photo,phoneNumber);
         var personProfile= personProfileCommandService.handle(createPersonProfileCommand);
         return personProfile.isEmpty()?Long.valueOf(0L):personProfile.get().getId();
+    }
+    @Override
+    public Long createBusinessProfile(String businessName, String emailAddress, String phoneNumber, String street, String number, String city, String postalCode, String country, String photoUrl, String ruc) {
+        var createBusinessProfileCommand= new CreateBusinessProfileCommand(businessName,emailAddress,phoneNumber,street,number,city,postalCode,country,photoUrl,ruc);
+        var businessProfile= businessProfileCommandService.handle(createBusinessProfileCommand);
+        return businessProfile.isEmpty()?Long.valueOf(0L):businessProfile.get().getId();
+    }
+
+    @Override
+    public Long fetchBusinessProfileIdByRuc(String ruc) {
+        var getBusinessProfileQuery= new GetBusinessProfileByRucQuery(new Ruc(ruc));
+          var businessProfile= businessProfileQueryService.handle(getBusinessProfileQuery);
+          return businessProfile.isEmpty()?Long.valueOf(0L):businessProfile.get().getId();
     }
 
     @Override
@@ -54,4 +76,6 @@ public class ProfileContextFacadeImpl implements ProfilesContextFacade {
         personProfileCommandService.handle(deletePersonProfileCommand);
 
     }
+
+
 }

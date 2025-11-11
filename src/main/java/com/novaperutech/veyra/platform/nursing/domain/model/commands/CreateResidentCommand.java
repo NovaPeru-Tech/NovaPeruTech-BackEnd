@@ -2,7 +2,7 @@ package com.novaperutech.veyra.platform.nursing.domain.model.commands;
 
 import java.time.LocalDate;
 
-public record CreateResidentCommand(String dni, String firstName, String lastName,
+public record CreateResidentCommand(Long nursingHomeId,String dni, String firstName, String lastName,
                                     LocalDate birthDate, Integer Age, String emailAddress, String street,
                                     String number,
                                     String city,

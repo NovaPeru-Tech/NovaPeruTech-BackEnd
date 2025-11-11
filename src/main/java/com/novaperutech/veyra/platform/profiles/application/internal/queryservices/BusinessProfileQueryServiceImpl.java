@@ -3,6 +3,8 @@ package com.novaperutech.veyra.platform.profiles.application.internal.queryservi
 import com.novaperutech.veyra.platform.profiles.domain.model.aggregates.BusinessProfile;
 import com.novaperutech.veyra.platform.profiles.domain.model.queries.GetAllBusinessProfileQuery;
 import com.novaperutech.veyra.platform.profiles.domain.model.queries.GetBusinessProfileByIdQuery;
+import com.novaperutech.veyra.platform.profiles.domain.model.queries.GetBusinessProfileByRucQuery;
+import com.novaperutech.veyra.platform.profiles.domain.model.valueobjects.Ruc;
 import com.novaperutech.veyra.platform.profiles.domain.services.BusinessProfileQueryService;
 import com.novaperutech.veyra.platform.profiles.infrastructure.persistence.jpa.repositories.BusinessProfileRepository;
 import org.springframework.stereotype.Service;
@@ -26,5 +28,11 @@ public class BusinessProfileQueryServiceImpl implements BusinessProfileQueryServ
     @Override
     public List<BusinessProfile> handle(GetAllBusinessProfileQuery query) {
         return businessProfileRepository.findAll();
+    }
+
+    @Override
+    public Optional<BusinessProfile> handle(GetBusinessProfileByRucQuery query) {
+
+        return businessProfileRepository.findByRuc(query.ruc());
     }
 }

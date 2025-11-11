@@ -5,9 +5,10 @@ import com.novaperutech.veyra.platform.nursing.domain.model.aggregates.Resident;
 import com.novaperutech.veyra.platform.nursing.domain.model.commands.CreateResidentCommand;
 import com.novaperutech.veyra.platform.nursing.domain.model.commands.DeleteResidentCommand;
 import com.novaperutech.veyra.platform.nursing.domain.model.commands.UpdateResidentCommand;
-import com.novaperutech.veyra.platform.nursing.domain.model.valueobjetcs.EmergencyContact;
-import com.novaperutech.veyra.platform.nursing.domain.model.valueobjetcs.LegalRepresentative;
+import com.novaperutech.veyra.platform.nursing.domain.model.valueobjects.EmergencyContact;
+import com.novaperutech.veyra.platform.nursing.domain.model.valueobjects.LegalRepresentative;
 import com.novaperutech.veyra.platform.nursing.domain.services.ResidentCommandServices;
+import com.novaperutech.veyra.platform.nursing.infrastructure.persistence.jpa.repositories.NursingHomeRepository;
 import com.novaperutech.veyra.platform.nursing.infrastructure.persistence.jpa.repositories.ResidentRepository;
 import org.springframework.stereotype.Service;
 
@@ -17,55 +18,83 @@ import java.util.Optional;
 public class ResidentCommandServiceImpl implements ResidentCommandServices {
     private  final ExternalProfileService externalProfileService;
     private  final ResidentRepository residentRepository;
-    public ResidentCommandServiceImpl(ExternalProfileService externalProfileService, ResidentRepository residentRepository) {
+    private final NursingHomeRepository nursingHomeRepository;
+    public ResidentCommandServiceImpl(ExternalProfileService externalProfileService, ResidentRepository residentRepository, NursingHomeRepository nursingHomeRepository) {
         this.externalProfileService = externalProfileService;
         this.residentRepository = residentRepository;
+        this.nursingHomeRepository = nursingHomeRepository;
     }
 
     @Override
     public Long handle(CreateResidentCommand command) {
-        var personProfileId= externalProfileService.fetchProfileByDni(command.dni());
-        if(personProfileId.isEmpty()){
-            personProfileId= externalProfileService.createPersonProfile(
-                    command.dni(),command.firstName(),command.lastName(),command.birthDate(),command.Age(),command.emailAddress(),command.street()
-                    ,command.number(),command.city(),command.postalCode(),command.country(),
-                    command.photo(),command.phoneNumber()
+        var nursingHome = nursingHomeRepository.findById(command.nursingHomeId())
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Nursing home not found with id: " + command.nursingHomeId()));
+
+        var personProfileId = externalProfileService.fetchProfileByDni(command.dni());
+
+        if (personProfileId.isEmpty()) {
+            personProfileId = externalProfileService.createPersonProfile(
+                    command.dni(),
+                    command.firstName(),
+                    command.lastName(),
+                    command.birthDate(),
+                    command.Age(),
+                    command.emailAddress(),
+                    command.street(),
+                    command.number(),
+                    command.city(),
+                    command.postalCode(),
+                    command.country(),
+                    command.photo(),
+                    command.phoneNumber()
             );
+
+            if (personProfileId.isEmpty()) {
+                throw new IllegalArgumentException("Unable to create person profile");
+            }
         }
-        else {
-            residentRepository.findByPersonProfileId(personProfileId.get()).ifPresent(resident->{
-                var message =String.format("Resident with personProfileId %s already exists with same profile",resident.getId());
-                throw new IllegalArgumentException(message);
-            });
+
+        if (residentRepository.existsByNursingHomeIdAndPersonProfileId(
+                command.nursingHomeId(),
+                personProfileId.get())) {
+            throw new IllegalArgumentException("Resident already exists in this nursing home");
         }
-        if (personProfileId.isEmpty()){
-            throw new IllegalArgumentException("Unable to create resident profile ");
-        }
-        var emergencyContact= new EmergencyContact(command.emergencyContactFirstName(),command.emergencyContactLastName(),command.emergencyContactPhoneNumber());
-        var legalRepresentative= new LegalRepresentative(command.legalRepresentativeFirstName(),command.legalRepresentativeLastName(),command.legalRepresentativePhoneNumber());
-        var resident= new Resident(personProfileId.get(),legalRepresentative,emergencyContact);
+
+        var emergencyContact = new EmergencyContact(
+                command.emergencyContactFirstName(),
+                command.emergencyContactLastName(),
+                command.emergencyContactPhoneNumber()
+        );
+
+        var legalRepresentative = new LegalRepresentative(
+                command.legalRepresentativeFirstName(),
+                command.legalRepresentativeLastName(),
+                command.legalRepresentativePhoneNumber()
+        );
+        var resident = new Resident(
+                nursingHome,
+                personProfileId.get(),
+                legalRepresentative,
+                emergencyContact
+        );
+
         residentRepository.save(resident);
         return resident.getId();
     }
 
     @Override
     public Optional<Resident> handle(UpdateResidentCommand command) {
-        var result = residentRepository.findById(command.id());
-        if (result.isEmpty()) {
-            throw new IllegalArgumentException("Resident with residentId " + command.id() + " does not exist");
-        }
-
-        var residentUpdate = result.get();
-
+        var resident =residentRepository.findById(command.id()).orElseThrow(()-> new IllegalArgumentException("Resident not found with id:" + command.id()));
         try {
             externalProfileService.updatePersonProfile(
-                     residentUpdate.getPersonProfileId().personProfileId(),command.dni(), command.firstName(), command.lastName(),
+                     resident.getPersonProfileId().personProfileId(),command.dni(), command.firstName(), command.lastName(),
                     command.birthDate(), command.Age(), command.emailAddress(), command.street(),
                     command.number(), command.city(), command.postalCode(), command.country(),
                     command.photo(), command.phoneNumber()
             );
 
-          var updatedResident = residentUpdate
+          var updatedResident = resident
                     .updateLegalRepresentative(
                             command.legalRepresentativeFirstName(),
                             command.legalRepresentativeLastName(),
@@ -86,12 +115,10 @@ public class ResidentCommandServiceImpl implements ResidentCommandServices {
 
     @Override
     public void handle(DeleteResidentCommand command) {
-        var result= residentRepository.findById(command.residentId());
-        if (result.isEmpty()){throw new IllegalArgumentException(" Resident with residentId"+command.residentId()+" does not exist");}
-        var residentDelete= result.get();
+        var resident= residentRepository.findById(command.residentId()).orElseThrow(()->new IllegalArgumentException("Resident not found"));
         try{
-            externalProfileService.deletePersonProfile(command.residentId());
-            residentRepository.delete(residentDelete);
+            externalProfileService.deletePersonProfile(resident.getPersonProfileId().personProfileId());
+            residentRepository.delete(resident);
         }catch(Exception e){
             throw new IllegalArgumentException("Error while delete resident: %s".formatted(e.getMessage()));
         }
