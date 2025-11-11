@@ -1,7 +1,7 @@
 package com.novaperutech.veyra.platform.nursing.application.internal.outboundservices.acl;
 
-import com.novaperutech.veyra.platform.nursing.domain.model.valueobjetcs.BusinessProfileId;
-import com.novaperutech.veyra.platform.nursing.domain.model.valueobjetcs.PersonProfileId;
+import com.novaperutech.veyra.platform.nursing.domain.model.valueobjects.BusinessProfileId;
+import com.novaperutech.veyra.platform.nursing.domain.model.valueobjects.PersonProfileId;
 import com.novaperutech.veyra.platform.profiles.interfaces.acl.ProfilesContextFacade;
 import org.springframework.stereotype.Service;
 
