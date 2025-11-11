@@ -1,315 +1,194 @@
 @startuml
-package "NursingHome Bounded Context" {
+title Nursing Bounded Context
+top to bottom direction
+skinparam packageStyle Rectangle
+skinparam linetype ortho
+skinparam classAttributeIconSize 0
+scale 1400 height
 
-    package "Domain" {
-        package "services"{
-            interface "NursingHomeCommandService"{
-                + handle(CreateNursingHomeCommand): Optional<NursingHome>
-            }
-            interface "NursingHomeQueryService"{
-                + handle(GetAllNursingHomeQuery): List<NursingHome>
-                + handle(GetNursingHomeByIdQuery): Optional<NursingHome>
-            }
-            interface "HeadQuarterCommandService"{
-                + handle(CreateHeadQuarterCommand): Long
-            }
-            interface "HeadQuarterQueryService"{
-                + handle(GetHeadQuarterByIdQuery): Optional<Headquarter>
-                + handle(GetAllHeadQuarterByNursingHomeIdQuery): List<Headquarter>
-            }
-        }
+package "Nursing Bounded Context" {
 
-        package "exceptions" {
-            class AdministratorIdCannotBeNullException
-            class DescriptionCannotBeNullException
-            class DuplicateNameException
-            class DuplicatePhoneNumberException
-            class DuplicateRucException
-            class InvalidDescriptionLengthException
-            class InvalidRucLengthException
-            class NameCannotBeNullException
-            class NonPositiveAdministratorIdException
-            class NullAddressException
-            class PhoneNumberCannotBeNullException
-            class RucCannotBeNullException
-        }
+  package "domain" {
 
-        package "Model" {
-            package "Aggregates" {
-                class "NursingHome" {
-                    - id: Long
-                    - name: Name
-                    - phoneNumber: PhoneNumber
-                    - address: Address
-                    - ruc: Ruc
-                    - description: Description
-                    + NursingHome()
-                    + NursingHome(CreateNursingHomeCommand)
-                }
-            }
-
-            package "Commands" {
-                class CreateHeadQuarterCommand {
-                    + nursingHomeId: Long
-                    + title: String
-                    + address: String
-                }
-
-                class CreateNursingHomeCommand {
-                    + name: String
-                    + ruc: String
-                    + phoneNumber: String
-                    + address: String
-                    + description: String
-                }
-
-                class DeleteHeadQuarterCommand
-                class UpdateHeadQuarterCommand
-                class UpdateNursingHomeCommand
-            }
-
-            package "Queries" {
-                class GetAllHeadQuarterByNursingHomeIdQuery {
-                    + id: Long
-                }
-
-                class GetAllNursingHomeQuery
-
-                class GetHeadQuarterByIdQuery {
-                    + id: Long
-                }
-
-                class GetNursingHomeByIdQuery {
-                    + id: Long
-                }
-            }
-
-            package "Value Objects" {
-                class Address<<record>> {
-                    + address: String
-                }
-
-                class AdministratorId<<record>> {
-                    + administratorId: Long
-                }
-
-                class Description<<record>> {
-                    + description: String
-                }
-
-                class Name<<record>> {
-                    + name: String
-                }
-
-                class PhoneNumber<<record>> {
-                    + phoneNumber: String
-                }
-
-                class Ruc<<record>> {
-                    + ruc: String
-                }
-            }
-
-            package "entities" {
-                class "Headquarter"{
-                    - id: Long
-                    - nursingHome: NursingHome
-                    - title: String
-                    - address: Address
-                    + Headquarter()
-                    + Headquarter(NursingHome, String, Address)
-                    + updateTitle(String): void
-                    + updateAddress(Address): void
-                }
-            }
-
-            package "events"{
-            }
-        }
+    package "services" {
+      interface ResidentCommandServices {
+        +handle(CreateResidentCommand): Optional<Resident>
+        +handle(UpdateResidentCommand): Optional<Resident>
+        +handle(DeleteResidentCommand): void
+      }
+      interface ResidentQueryServices {
+        +handle(GetAllResidentsQuery): List<Resident>
+        +handle(GetResidentByIdQuery): Optional<Resident>
+        +handle(GetResidentByPersonProfileQuery): Optional<Resident>
+      }
     }
 
-    package "application" {
-        package "Internal" {
-            package "outboundeservices.acl"{
-            }
+    package "model" {
 
-            package "commandservices" {
-                class HeadQuarterCommandServiceImpl {
-                    - headQuarterRepository: HeadQuarterRepository
-                    - nursingHomeRepository: NursingHomeRepository
-                    + handle(CreateHeadQuarterCommand): Long
-                }
-
-                class NursingHomeCommandServiceImpl {
-                    - nursingHomeRepository: NursingHomeRepository
-
-                    + handle(CreateNursingHomeCommand): Optional<NursingHome>
-                }
-            }
-
-            package "queryservices" {
-                class HeadQuarterQueryServiceImpl {
-                    - headQuarterRepository: HeadQuarterRepository
-                    + handle(GetHeadQuarterByIdQuery): Optional<Headquarter>
-                    + handle(GetAllHeadQuarterByNursingHomeIdQuery): List<Headquarter>
-                }
-
-                class NursingHomeQueryServiceImpl {
-                    - nursingHomeRepository: NursingHomeRepository
-                    + handle(GetAllNursingHomeQuery): List<NursingHome>
-                    + handle(GetNursingHomeByIdQuery): Optional<NursingHome>
-                }
-            }
+      package "aggregates" {
+        class Resident {
+          - id: Long
+          - personProfileId: PersonProfileId
+          - emergencyContact: EmergencyContact
+          - legalRepresentative: LegalRepresentative
+          + Resident()
+          + Resident(CreateResidentCommand)
+          + update(UpdateResidentCommand): void
         }
+      }
+
+      package "commands" {
+        class CreateResidentCommand {
+          + personProfileId: Long
+          + emergencyContact: String
+          + legalRepresentative: String
+        }
+        class UpdateResidentCommand {
+          + id: Long
+          + emergencyContact: String
+          + legalRepresentative: String
+        }
+        class DeleteResidentCommand {
+          + id: Long
+        }
+      }
+
+      package "queries" {
+        class GetAllResidentsQuery
+        class GetResidentByIdQuery {
+          + id: Long
+        }
+        class GetResidentByPersonProfileQuery {
+          + personProfileId: Long
+        }
+      }
+
+      package "valueobjects" {
+        class PersonProfileId <<VO>> {
+          + value: Long
+        }
+        class EmergencyContact <<VO>> {
+          + fullName: String
+          + phoneNumber: String
+        }
+        class LegalRepresentative <<VO>> {
+          + fullName: String
+          + phoneNumber: String
+        }
+      }
+    }
+  }
+
+  package "application.internal" {
+
+    package "outboundservices.acl" {
+      ' Adaptador hacia Profiles BC (puerto de salida)
+      class ExternalProfileService {
+        + existsPersonProfile(personProfileId: Long): boolean
+        ' (o: +getPersonProfile(personProfileId: Long): Optional<ProfileResource>)
+      }
     }
 
-    package "infrastructure" {
-        package "persistence.jpa.repositories" {
-            interface HeadQuarterRepository {
-                + findAllByNursingHomeId(Long): List<Headquarter>
-            }
-
-            interface NursingHomeRepository {
-                + existsByName(Name): boolean
-                + existsByRuc(Ruc): boolean
-                + existsByPhoneNumber(PhoneNumber): boolean
-            }
-        }
+    package "commandservices" {
+      class ResidentCommandServiceImpl {
+        - residentRepository: ResidentRepository
+        - externalProfileService: ExternalProfileService
+        + handle(CreateResidentCommand): Optional<Resident>
+        + handle(UpdateResidentCommand): Optional<Resident>
+        + handle(DeleteResidentCommand): void
+      }
     }
 
-    package "interfaces.rest" {
-        package "resources" {
-            class CreateHeadQuarterResource<<record>> {
-                + title: String
-                + address: String
-            }
+    package "queryservices" {
+      class ResidentQueryCommandImpl {
+        - residentRepository: ResidentRepository
+        + handle(GetAllResidentsQuery): List<Resident>
+        + handle(GetResidentByIdQuery): Optional<Resident>
+        + handle(GetResidentByPersonProfileQuery): Optional<Resident>
+      }
+    }
+  }
 
-            class CreateNursingHomeResource<<record>> {
-                + name: String
-                + ruc: String
-                + phoneNumber: String
-                + address: String
-                + description: String
-            }
+  package "infrastructure.persistence.jpa.repositories" {
+    interface ResidentRepository {
+      + findAll(): List<Resident>
+      + findById(Long): Optional<Resident>
+      + findByPersonProfileId(PersonProfileId): Optional<Resident>
+      + existsByPersonProfileId(PersonProfileId): boolean
+      + save(Resident): Resident
+      + deleteById(Long): void
+    }
+  }
 
-            class HeadQuarterResource<<record>> {
-                + id: Long
-                + nursingHomeId: Long
-                + title: String
-                + address: String
-            }
+  package "interfaces.rest" {
 
-            class NursingHomeResource<<record>> {
-                + id: Long
-                + name: String
-                + ruc: String
-                + phoneNumber: String
-                + address: String
-                + description: String
-            }
-
-            class UpdateNursingHomeResource<<record>>
-            class UpdateHeadQuarterResource<<record>>
-        }
-
-        package "transform" {
-            class CreateHeadQuarterCommandFromResourceAssembler {
-                + {static} toCommandFromResource(Long, CreateHeadQuarterResource): CreateHeadQuarterCommand
-            }
-
-            class CreateNursingHomeCommandFromResourceAssembler {
-                + {static} toCommandFromResource(CreateNursingHomeResource): CreateNursingHomeCommand
-            }
-
-            class HeadQuarterResourceFromEntityAssembler {
-                + {static} toResourceFromEntity(Headquarter): HeadQuarterResource
-            }
-
-            class NursingHomeResourceFromEntityAssembler {
-                + {static} toCommandFromEntity(NursingHome): NursingHomeResource
-            }
-
-            class UpdateHeadQuarterCommandFromResourceAssembler
-            class UpdateNursingHomeCommandFromResourceAssembler
-        }
-
-        class HeadQuartersController {
-            - headQuarterCommandService: HeadQuarterCommandService
-            - headQuarterQueryService: HeadQuarterQueryService
-            + createdHeadQuarter(Long, CreateHeadQuarterResource): ResponseEntity<HeadQuarterResource>
-            + GetAllHeadQuartersByNursingHomeId(Long): ResponseEntity<List<HeadQuarterResource>>
-        }
-
-        class NursingHomesController {
-            - nursingHomeCommandService: NursingHomeCommandService
-            - nursingHomeQueryService: NursingHomeQueryService
-            + createNursingHome(CreateNursingHomeResource): ResponseEntity<NursingHomeResource>
-            + getAllNursingHome(): ResponseEntity<List<NursingHomeResource>>
-            + getNursingHomeById(Long): ResponseEntity<NursingHomeResource>
-        }
+    package "resources" {
+      class ResidentResource {
+        + id: Long
+        + personProfileId: Long
+        + emergencyContact: String
+        + legalRepresentative: String
+      }
+      class CreateResidentResource {
+        + personProfileId: Long
+        + emergencyContact: String
+        + legalRepresentative: String
+      }
+      class UpdateResidentResource {
+        + emergencyContact: String
+        + legalRepresentative: String
+      }
     }
 
-    package "interfaces.acl"{
+    package "transform" {
+      class ResidentResourceFromEntityAssembler {
+        + toResourceFromEntity(entity: Resident): ResidentResource {static}
+      }
+      class CreateResidentCommandFromResourceAssembler {
+        + toCommandFromResource(resource: CreateResidentResource): CreateResidentCommand {static}
+      }
+      class UpdateResidentCommandFromResourceAssembler {
+        + toCommandFromResource(id: Long, resource: UpdateResidentResource): UpdateResidentCommand {static}
+      }
     }
+
+    class ResidentsController {
+      - residentCommandServices: ResidentCommandServices
+      - residentQueryServices: ResidentQueryServices
+      + createResident(resource: CreateResidentResource): ResponseEntity<ResidentResource>
+      + updateResident(id: Long, resource: UpdateResidentResource): ResponseEntity<ResidentResource>
+      + deleteResident(id: Long): ResponseEntity<Void>
+      + getResidentById(id: Long): ResponseEntity<ResidentResource>
+      + getResidentByPersonProfileId(personProfileId: Long): ResponseEntity<ResidentResource>
+      + getAllResidents(): ResponseEntity<List<ResidentResource>>
+    }
+  }
 }
 
-NursingHome *-- Name
-NursingHome *-- Ruc
-NursingHome *-- PhoneNumber
-NursingHome *-- Address
-NursingHome *-- Description
-NursingHome ..> CreateNursingHomeCommand : uses
+' ===== Composiciones del Aggregate =====
+Resident *-- PersonProfileId
+Resident *-- EmergencyContact
+Resident *-- LegalRepresentative
 
-Headquarter *-- Address
-Headquarter --> NursingHome : belongs to
+' ===== Implementaciones & dependencias =====
+ResidentCommandServiceImpl ..|> ResidentCommandServices
+ResidentQueryCommandImpl ..|> ResidentQueryServices
 
-NursingHomeCommandServiceImpl ..|> NursingHomeCommandService
-NursingHomeCommandServiceImpl --> NursingHomeRepository
-NursingHomeCommandServiceImpl ..> CreateNursingHomeCommand : handles
-NursingHomeCommandServiceImpl ..> NursingHome : creates
+ResidentCommandServiceImpl --> ResidentRepository
+ResidentCommandServiceImpl --> ExternalProfileService
+ResidentQueryCommandImpl --> ResidentRepository
 
-HeadQuarterCommandServiceImpl ..|> HeadQuarterCommandService
-HeadQuarterCommandServiceImpl --> HeadQuarterRepository
-HeadQuarterCommandServiceImpl --> NursingHomeRepository
-HeadQuarterCommandServiceImpl ..> CreateHeadQuarterCommand : handles
-HeadQuarterCommandServiceImpl ..> Headquarter : creates
+' ===== Repositorio y transformaciones =====
+ResidentsController --> ResidentCommandServices
+ResidentsController --> ResidentQueryServices
+ResidentsController ..> CreateResidentCommandFromResourceAssembler : uses
+ResidentsController ..> UpdateResidentCommandFromResourceAssembler : uses
+ResidentsController ..> ResidentResourceFromEntityAssembler : uses
 
-NursingHomeQueryServiceImpl ..|> NursingHomeQueryService
-NursingHomeQueryServiceImpl --> NursingHomeRepository
-NursingHomeQueryServiceImpl ..> GetAllNursingHomeQuery : handles
-NursingHomeQueryServiceImpl ..> GetNursingHomeByIdQuery : handles
-
-HeadQuarterQueryServiceImpl ..|> HeadQuarterQueryService
-HeadQuarterQueryServiceImpl --> HeadQuarterRepository
-HeadQuarterQueryServiceImpl ..> GetHeadQuarterByIdQuery : handles
-HeadQuarterQueryServiceImpl ..> GetAllHeadQuarterByNursingHomeIdQuery : handles
-
-
-NursingHomesController --> NursingHomeCommandService
-NursingHomesController --> NursingHomeQueryService
-NursingHomesController ..> CreateNursingHomeResource : receives
-NursingHomesController ..> NursingHomeResource : returns
-
-HeadQuartersController --> HeadQuarterCommandService
-HeadQuartersController --> HeadQuarterQueryService
-HeadQuartersController ..> CreateHeadQuarterResource : receives
-HeadQuartersController ..> HeadQuarterResource : returns
-
-CreateNursingHomeCommandFromResourceAssembler ..> CreateNursingHomeResource : transforms
-CreateNursingHomeCommandFromResourceAssembler ..> CreateNursingHomeCommand : creates
-
-CreateHeadQuarterCommandFromResourceAssembler ..> CreateHeadQuarterResource : transforms
-CreateHeadQuarterCommandFromResourceAssembler ..> CreateHeadQuarterCommand : creates
-
-NursingHomeResourceFromEntityAssembler ..> NursingHome : transforms
-NursingHomeResourceFromEntityAssembler ..> NursingHomeResource : creates
-
-HeadQuarterResourceFromEntityAssembler ..> Headquarter : transforms
-HeadQuarterResourceFromEntityAssembler ..> HeadQuarterResource : creates
-
-NursingHomesController ..> CreateNursingHomeCommandFromResourceAssembler : uses
-NursingHomesController ..> NursingHomeResourceFromEntityAssembler : uses
-HeadQuartersController ..> CreateHeadQuarterCommandFromResourceAssembler : uses
-HeadQuartersController ..> HeadQuarterResourceFromEntityAssembler : uses
-
+CreateResidentCommandFromResourceAssembler ..> CreateResidentResource : transforms
+CreateResidentCommandFromResourceAssembler ..> CreateResidentCommand : creates
+UpdateResidentCommandFromResourceAssembler ..> UpdateResidentResource : transforms
+UpdateResidentCommandFromResourceAssembler ..> UpdateResidentCommand : creates
+ResidentResourceFromEntityAssembler ..> Resident : transforms
+ResidentResourceFromEntityAssembler ..> ResidentResource : creates
 @enduml
