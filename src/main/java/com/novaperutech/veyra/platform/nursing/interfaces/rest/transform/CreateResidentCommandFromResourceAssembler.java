@@ -4,9 +4,9 @@ import com.novaperutech.veyra.platform.nursing.domain.model.commands.CreateResid
 import com.novaperutech.veyra.platform.nursing.interfaces.rest.resources.CreateResidentResource;
 
 public class CreateResidentCommandFromResourceAssembler {
-    public static CreateResidentCommand toCommandFromResource(CreateResidentResource resource)
+    public static CreateResidentCommand toCommandFromResource(CreateResidentResource resource, Long nursingHomeId)
     {
-      return new CreateResidentCommand(resource.dni(),resource.firstName(),resource.lastName(),resource.birthDate(),
+      return new CreateResidentCommand(nursingHomeId,resource.dni(),resource.firstName(),resource.lastName(),resource.birthDate(),
        resource.Age(),resource.emailAddress(),resource.street(),resource.number(),resource.city(),resource.postalCode(),
               resource.country(),resource.photo(),resource.phoneNumber()
               ,resource.legalRepresentativeFirstName(),resource.legalRepresentativeLastName(),resource.legalRepresentativePhoneNumber(),
