@@ -1,4 +1,4 @@
-package com.novaperutech.veyra.platform.nursing.domain.model.valueobjetcs;
+package com.novaperutech.veyra.platform.nursing.domain.model.valueobjects;
 
 public record BusinessProfileId(Long businessProfileId) {
     public BusinessProfileId {
