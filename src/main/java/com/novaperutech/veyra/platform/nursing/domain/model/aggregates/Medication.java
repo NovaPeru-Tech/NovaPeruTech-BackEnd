@@ -1,0 +1,55 @@
+package com.novaperutech.veyra.platform.nursing.domain.model.aggregates;
+import com.novaperutech.veyra.platform.nursing.domain.model.valueobjects.DrugPresentation;
+import com.novaperutech.veyra.platform.nursing.domain.model.valueobjects.ExpirationDate;
+import com.novaperutech.veyra.platform.nursing.domain.model.valueobjects.Stock;
+import com.novaperutech.veyra.platform.shared.domain.model.aggregates.AuditableAbstractAggregateRoot;
+import jakarta.persistence.*;
+import lombok.Getter;
+@Entity
+@Getter
+public class Medication extends AuditableAbstractAggregateRoot<Medication> {
+  private final  int LOW_STOCK_THRESHOLD=15;
+@Column(nullable = false)
+    private String description;
+@Column(nullable = false)
+    private String name;
+@Embedded
+    private Stock stock;
+@Embedded
+private ExpirationDate expirationDate;
+@Column(nullable = false)
+private String dosage;
+@ManyToOne
+@JoinColumn(name ="resident_id")
+private Resident resident;
+@Column(nullable = false)
+@Enumerated(EnumType.STRING)
+private DrugPresentation drugPresentation;
+
+public Medication(){}
+ public Medication(String name,String description, Stock stock,ExpirationDate expirationDate,DrugPresentation drugPresentation,String dosage,Resident resident)
+ {
+     this.description= description;
+     this.name= name;
+     this.stock= stock;
+     this.expirationDate=expirationDate;
+     this.resident=resident;
+     this.dosage=dosage;
+     this.drugPresentation=drugPresentation;
+ }
+public Medication decreaseStock(int quantity)
+{
+    if (!this.stock.hasEnough(quantity)){
+     throw new IllegalArgumentException( String.format("Insufficient stock for medication '%s'. Available: %d, Requested: %d",
+             name, stock.amount(), quantity));
+    }
+    this.stock=stock.decrease(quantity);
+    if (stock.isLow(LOW_STOCK_THRESHOLD)){
+        //this.registerEvent(new MedicationStockLowEvent(this.getId()))
+    }
+    return this;
+}
+    public boolean hasEnoughStock(int quantity) {
+        return stock.hasEnough(quantity);
+    }
+}
