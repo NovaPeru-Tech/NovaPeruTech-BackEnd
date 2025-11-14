@@ -2,12 +2,16 @@ package com.novaperutech.veyra.platform.nursing.application.internal.commandserv
 
 import com.novaperutech.veyra.platform.nursing.application.internal.outboundservices.acl.ExternalProfileService;
 import com.novaperutech.veyra.platform.nursing.domain.model.aggregates.Resident;
+import com.novaperutech.veyra.platform.nursing.domain.model.commands.AddMedicationAdministrationCommand;
 import com.novaperutech.veyra.platform.nursing.domain.model.commands.CreateResidentCommand;
 import com.novaperutech.veyra.platform.nursing.domain.model.commands.DeleteResidentCommand;
 import com.novaperutech.veyra.platform.nursing.domain.model.commands.UpdateResidentCommand;
+import com.novaperutech.veyra.platform.nursing.domain.model.valueobjects.AdministeredAt;
 import com.novaperutech.veyra.platform.nursing.domain.model.valueobjects.EmergencyContact;
 import com.novaperutech.veyra.platform.nursing.domain.model.valueobjects.LegalRepresentative;
+import com.novaperutech.veyra.platform.nursing.domain.model.valueobjects.StaffMemberId;
 import com.novaperutech.veyra.platform.nursing.domain.services.ResidentCommandServices;
+import com.novaperutech.veyra.platform.nursing.infrastructure.persistence.jpa.repositories.MedicationRepository;
 import com.novaperutech.veyra.platform.nursing.infrastructure.persistence.jpa.repositories.NursingHomeRepository;
 import com.novaperutech.veyra.platform.nursing.infrastructure.persistence.jpa.repositories.ResidentRepository;
 import org.springframework.stereotype.Service;
@@ -19,10 +23,12 @@ public class ResidentCommandServiceImpl implements ResidentCommandServices {
     private  final ExternalProfileService externalProfileService;
     private  final ResidentRepository residentRepository;
     private final NursingHomeRepository nursingHomeRepository;
-    public ResidentCommandServiceImpl(ExternalProfileService externalProfileService, ResidentRepository residentRepository, NursingHomeRepository nursingHomeRepository) {
+    private final MedicationRepository medicationRepository;
+    public ResidentCommandServiceImpl(ExternalProfileService externalProfileService, ResidentRepository residentRepository, NursingHomeRepository nursingHomeRepository, MedicationRepository medicationRepository) {
         this.externalProfileService = externalProfileService;
         this.residentRepository = residentRepository;
         this.nursingHomeRepository = nursingHomeRepository;
+        this.medicationRepository = medicationRepository;
     }
 
     @Override
@@ -122,6 +128,20 @@ public class ResidentCommandServiceImpl implements ResidentCommandServices {
         }catch(Exception e){
             throw new IllegalArgumentException("Error while delete resident: %s".formatted(e.getMessage()));
         }
+    }
+
+    @Override
+    public void handle(AddMedicationAdministrationCommand command) {
+  var resident= residentRepository.findById(command.residentId()).orElseThrow(()->new IllegalArgumentException("Resident not found"));
+  var medication= medicationRepository.findByName(command.medicationName()).orElseThrow(()->new  IllegalArgumentException("Medication not found"));
+  if (!medication.getResident().getId().equals(resident.getId())){
+      throw new IllegalArgumentException("Medication already exists in this resident");
+  }
+  var staffMemberId=new StaffMemberId(command.staffMemberId());
+  var administeredAt=new AdministeredAt(command.administeredAt());
+  resident.addMedicationAdministration(medication,staffMemberId,administeredAt,command.quantityAdministered(),command.wasAdministered(),command.notes());
+    medicationRepository.save(medication);
+    residentRepository.save(resident);
     }
 
 

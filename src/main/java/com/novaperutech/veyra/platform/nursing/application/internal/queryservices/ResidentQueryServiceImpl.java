@@ -1,6 +1,7 @@
 package com.novaperutech.veyra.platform.nursing.application.internal.queryservices;
 
 import com.novaperutech.veyra.platform.nursing.domain.model.aggregates.Resident;
+import com.novaperutech.veyra.platform.nursing.domain.model.entities.MedicationAdministration;
 import com.novaperutech.veyra.platform.nursing.domain.model.queries.*;
 import com.novaperutech.veyra.platform.nursing.domain.model.valueobjects.ResidentState;
 import com.novaperutech.veyra.platform.nursing.domain.services.ResidentQueryServices;
@@ -35,6 +36,11 @@ public class ResidentQueryServiceImpl implements ResidentQueryServices {
     @Override
     public List<Resident> handle(GetActiveResidentsByNursingHomeId query) {
         return residentRepository.findByNursingHomeIdAndResidentStatus(query.nursingHomeId(), ResidentState.ACTIVE);
+    }
+
+    @Override
+    public List<MedicationAdministration> handle(GetMedicationAdministrationsByResidentIdQuery query) {
+        return residentRepository.findMedicationAdministrationsByResidentId(query.residentId());
     }
 
 
