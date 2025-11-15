@@ -10,18 +10,17 @@ public class ActivityResourceFromViewAssembler {
 
     public static ActivityResource toResourceFromView(ActivityView view) {
         String hourRange = String.format("%s-%s",
-                view.getStartTime().format(TIME_FORMATTER),
-                view.getEndTime().format(TIME_FORMATTER)
+                view.startTime().format(TIME_FORMATTER),
+                view.endTime().format(TIME_FORMATTER)
         );
 
-        // Mapea al ActivityResource que tu frontend espera
         return new ActivityResource(
-                view.getActivityId(),
+                view.activityId(),
                 hourRange,
-                view.getAttendantName(),
-                view.getActivityName(),
-                view.getArea(),
-                view.getStatus().toString()
+                view.attendantName(),
+                view.activityName(),
+                view.area(),
+                view.status().toString()
         );
     }
 }

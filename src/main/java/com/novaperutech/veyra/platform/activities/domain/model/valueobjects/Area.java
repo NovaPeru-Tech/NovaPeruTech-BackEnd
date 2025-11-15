@@ -1,38 +1,37 @@
-// language: java
 package com.novaperutech.veyra.platform.activities.domain.model.valueobjects;
-
+import jakarta.persistence.Embeddable;
 import java.util.Objects;
 
+@Embeddable
 public class Area {
 
     private final String areaCode;
-    private final String name;
 
-    public Area(String areaCode, String name) {
-        this.areaCode = areaCode;
-        this.name = name;
+    protected Area() {
+        this.areaCode = null;
     }
 
-    // Getter esperado por tu código
+    public Area(String areaCode) {
+        if (areaCode == null || areaCode.isBlank()) {
+            throw new IllegalArgumentException("Area code cannot be null or blank");
+        }
+        this.areaCode = areaCode;
+    }
+
     public String getAreaCode() {
         return areaCode;
-    }
-
-    public String getName() {
-        return name;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Area)) return false;
+        if (o == null || getClass() != o.getClass()) return false;
         Area area = (Area) o;
-        return Objects.equals(areaCode, area.areaCode) &&
-                Objects.equals(name, area.name);
+        return Objects.equals(areaCode, area.areaCode);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(areaCode, name);
+        return Objects.hash(areaCode);
     }
 }
