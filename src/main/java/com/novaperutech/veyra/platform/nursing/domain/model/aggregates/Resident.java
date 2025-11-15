@@ -1,15 +1,12 @@
 package com.novaperutech.veyra.platform.nursing.domain.model.aggregates;
-import com.novaperutech.veyra.platform.nursing.domain.model.valueobjects.EmergencyContact;
-import com.novaperutech.veyra.platform.nursing.domain.model.valueobjects.LegalRepresentative;
-import com.novaperutech.veyra.platform.nursing.domain.model.valueobjects.PersonProfileId;
-import com.novaperutech.veyra.platform.nursing.domain.model.valueobjects.ResidentState;
+import com.novaperutech.veyra.platform.nursing.domain.model.valueobjects.*;
 import com.novaperutech.veyra.platform.shared.domain.model.aggregates.AuditableAbstractAggregateRoot;
 import jakarta.persistence.*;
 import lombok.Getter;
 @Entity
 @Getter
 public class Resident extends AuditableAbstractAggregateRoot<Resident> {
-    protected Resident(){super();}
+    protected Resident(){super(); this.medicationAdministrationHistory= new MedicationAdministrationHistory();}
     @Embedded
     private PersonProfileId personProfileId;
     @Embedded
@@ -36,6 +33,8 @@ public class Resident extends AuditableAbstractAggregateRoot<Resident> {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private ResidentState residentStatus;
+    @Embedded
+    private final MedicationAdministrationHistory medicationAdministrationHistory;
     public Resident(Long personProfileId,String legalRepresentativeFirstName,String legalRepresentativeLastName,String legalRepresentativePhoneNumber
                ,String emergencyContactFirstName,String emergencyContactLastName,String emergencyContactPhoneNumber){
         this();
@@ -116,5 +115,14 @@ public Resident(NursingHome nursingHome,PersonProfileId personProfileId, LegalRe
     public Resident updateEmergencyContact(String firstName, String lastName, String phoneNumber) {
         this.emergencyContact = new EmergencyContact(firstName, lastName, phoneNumber);
         return this;
+    }
+    public void addMedicationAdministration(Medication medication,
+                                            StaffMemberId staffMemberId,
+                                            AdministeredAt administeredAt,
+                                            Integer quantityAdministered,
+                                            Boolean wasAdministered,
+                                            String notes){
+        this.medicationAdministrationHistory.addAdministration(this,medication,staffMemberId,administeredAt,quantityAdministered,wasAdministered,notes);
+
     }
 }
