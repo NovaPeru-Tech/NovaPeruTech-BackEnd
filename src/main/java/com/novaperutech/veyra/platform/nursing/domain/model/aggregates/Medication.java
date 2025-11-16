@@ -1,4 +1,5 @@
 package com.novaperutech.veyra.platform.nursing.domain.model.aggregates;
+import com.novaperutech.veyra.platform.nursing.domain.model.events.MedicationStockLowEvent;
 import com.novaperutech.veyra.platform.nursing.domain.model.valueobjects.DrugPresentation;
 import com.novaperutech.veyra.platform.nursing.domain.model.valueobjects.ExpirationDate;
 import com.novaperutech.veyra.platform.nursing.domain.model.valueobjects.Stock;
@@ -45,7 +46,7 @@ public Medication decreaseStock(int quantity)
     }
     this.stock=stock.decrease(quantity);
     if (stock.isLow(LOW_STOCK_THRESHOLD)){
-        //this.registerEvent(new MedicationStockLowEvent(this.getId()))
+        this.registerEvent(new MedicationStockLowEvent(this,this.getId(),this.name,this.getResident().getId()));
     }
     return this;
 }
