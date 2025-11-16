@@ -9,6 +9,5 @@ import java.util.Optional;
 
 @Repository
 public interface NursingHomeRepository extends JpaRepository<NursingHome,Long> {
-boolean existsByBusinessProfileId(BusinessProfileId businessProfileId);
 Optional<NursingHome> findByBusinessProfileId(BusinessProfileId businessProfileId);
 }

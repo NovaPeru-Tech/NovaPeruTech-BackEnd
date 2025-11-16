@@ -1,6 +1,7 @@
 package com.novaperutech.veyra.platform.nursing.application.internal.queryservices;
 
 import com.novaperutech.veyra.platform.nursing.domain.model.aggregates.NursingHome;
+import com.novaperutech.veyra.platform.nursing.domain.model.queries.ExistsByNursingHomeIdQuery;
 import com.novaperutech.veyra.platform.nursing.domain.model.queries.GetAllNursingHomeQuery;
 import com.novaperutech.veyra.platform.nursing.domain.model.queries.GetNursingHomeByIdQuery;
 import com.novaperutech.veyra.platform.nursing.domain.services.NursingHomeQueryServices;
@@ -27,5 +28,10 @@ private final NursingHomeRepository nursingHomeRepository;
     @Override
     public List<NursingHome> handle(GetAllNursingHomeQuery query) {
         return nursingHomeRepository.findAll();
+    }
+
+    @Override
+    public boolean handle(ExistsByNursingHomeIdQuery query) {
+        return nursingHomeRepository.existsById(query.nursingHomeId());
     }
 }

@@ -1,6 +1,7 @@
 package com.novaperutech.veyra.platform.nursing.domain.services;
 
 import com.novaperutech.veyra.platform.nursing.domain.model.aggregates.Medication;
+import com.novaperutech.veyra.platform.nursing.domain.model.queries.ExistsByResidentIdQuery;
 import com.novaperutech.veyra.platform.nursing.domain.model.queries.GetAllMedicationsByResidentIdQuery;
 import com.novaperutech.veyra.platform.nursing.domain.model.queries.GetMedicationByIdQuery;
 

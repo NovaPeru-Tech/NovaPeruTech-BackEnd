@@ -1,6 +1,7 @@
 package com.novaperutech.veyra.platform.nursing.domain.services;
 
 import com.novaperutech.veyra.platform.nursing.domain.model.aggregates.NursingHome;
+import com.novaperutech.veyra.platform.nursing.domain.model.queries.ExistsByNursingHomeIdQuery;
 import com.novaperutech.veyra.platform.nursing.domain.model.queries.GetAllNursingHomeQuery;
 import com.novaperutech.veyra.platform.nursing.domain.model.queries.GetNursingHomeByIdQuery;
 
@@ -10,4 +11,5 @@ import java.util.Optional;
 public interface NursingHomeQueryServices {
     Optional<NursingHome>handle(GetNursingHomeByIdQuery query);
     List<NursingHome>handle(GetAllNursingHomeQuery query);
+    boolean handle(ExistsByNursingHomeIdQuery query);
 }
