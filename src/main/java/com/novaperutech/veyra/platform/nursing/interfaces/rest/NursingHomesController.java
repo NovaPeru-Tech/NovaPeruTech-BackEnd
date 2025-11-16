@@ -23,7 +23,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
 @RequestMapping(value = "/api/v1/nursing-homes",produces = APPLICATION_JSON_VALUE)
-@Tag(name = "Nursing homes",description = "Available nursing home Endpoints")
+@Tag(name = "Nursing Homes",description = "Available nursing home Endpoints")
 public class NursingHomesController {
     private final NursingHomeCommandServices nursingHomeCommandServices;
     private final NursingHomeQueryServices nursingHomeQueryServices;
