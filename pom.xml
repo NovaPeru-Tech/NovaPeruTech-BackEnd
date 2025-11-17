@@ -8,10 +8,10 @@
         <version>3.5.6</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>com.veyra</groupId>
-    <artifactId>NovaPeruTech</artifactId>
+    <groupId>com.novaperutech.veyra</groupId>
+    <artifactId>platform</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>NovaPeruTech</name>
+    <name>Veyra-platform</name>
     <description>NovaPeruTech</description>
     <url/>
     <licenses>

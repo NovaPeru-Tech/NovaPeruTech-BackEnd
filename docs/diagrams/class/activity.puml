@@ -1,0 +1,61 @@
+@startuml
+package "activity-management Bounded Context" {
+
+    package "domain" {
+
+            package "exceptions" {
+            }
+        package "Model" {
+            package "aggregates" {
+            }
+            package "commands" {
+            }
+            package "queries" {
+            }
+            package "valueobjects" {
+            }
+            package "entities" {
+            }
+            package "events"{
+            }
+        }
+
+            package "services" {
+            }
+
+    }
+
+    package "application" {
+        package "Internal" {
+
+        package "outboundeservices.acl"{
+
+        }
+            package "commandservices" {
+            }
+            package "queryservices" {
+            }
+
+            package "eventhandlers" {
+            }
+
+        }
+    }
+
+    package "infrastructure" {
+        package "persistence.jpa.repositories" {
+        }
+    }
+     package "interfaces.rest" {
+                package "resources" {
+                }
+                package "transform" {
+                }
+
+            }
+            package "interfaces.acl"{
+            }
+
+
+}
+@enduml
