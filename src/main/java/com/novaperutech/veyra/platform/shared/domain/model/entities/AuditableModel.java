@@ -1,5 +1,14 @@
+/**
+ * Base class for auditable JPA entities.
+ *
+ * <p>This class provides common auditing fields such as {@code createdAt} and
+ * {@code updatedAt}, which are automatically managed by Spring Data JPA through
+ * the {@link AuditingEntityListener}. It is designed to be extended by entities
+ * that require automatic timestamp tracking.</p>
+ *
+ * @summary Provides auditing fields (creation and update timestamps) for JPA entities.
+ */
 package com.novaperutech.veyra.platform.shared.domain.model.entities;
-
 
 import jakarta.persistence.*;
 import lombok.Getter;
