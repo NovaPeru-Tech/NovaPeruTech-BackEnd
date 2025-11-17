@@ -2,6 +2,7 @@ package com.novaperutech.veyra.platform.nursing.application.internal.commandserv
 
 import com.novaperutech.veyra.platform.nursing.application.internal.outboundservices.acl.ExternalProfileService;
 import com.novaperutech.veyra.platform.nursing.domain.model.aggregates.NursingHome;
+import com.novaperutech.veyra.platform.nursing.domain.model.commands.AddARoomToTheNursingHomeCommand;
 import com.novaperutech.veyra.platform.nursing.domain.model.commands.CreateNursingHomeCommand;
 import com.novaperutech.veyra.platform.nursing.domain.services.NursingHomeCommandServices;
 import com.novaperutech.veyra.platform.nursing.infrastructure.persistence.jpa.repositories.NursingHomeRepository;
@@ -39,5 +40,15 @@ public class NursingHomeCommandServiceImpl implements NursingHomeCommandServices
         nursingHomeRepository.save(nursingHome);
         return nursingHome.getId();
 
+    }
+
+    @Override
+    public void handle(AddARoomToTheNursingHomeCommand command) {
+        nursingHomeRepository.findById(command.nursingHomeId())
+                .map(nursingHome -> {
+                    nursingHome.addRoom(command.capacity(), command.type());
+                    nursingHomeRepository.save(nursingHome);
+                    return nursingHome;
+                }).orElseThrow(() -> new IllegalArgumentException("Nursing home does not exist"));
     }
 }
