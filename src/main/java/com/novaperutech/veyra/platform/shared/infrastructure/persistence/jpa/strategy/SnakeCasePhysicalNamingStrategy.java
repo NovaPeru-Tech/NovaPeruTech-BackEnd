@@ -1,3 +1,17 @@
+/**
+ * Custom Hibernate naming strategy that converts entity, table, and column names
+ * into snake_case format. Additionally, table names are pluralized automatically.
+ *
+ * <p>This strategy ensures consistent database naming conventions by transforming
+ * Java-style identifiers (e.g., {@code UserAccount}) into snake_case
+ * (e.g., {@code user_account}). When applied to table names, it also pluralizes
+ * them using the {@code pluralize} utility.</p>
+ *
+ * <p>It is commonly used to maintain clean and predictable naming patterns across
+ * the persistence layer.</p>
+ *
+ * @summary Converts physical names to snake_case and pluralizes table names.
+ */
 package com.novaperutech.veyra.platform.shared.infrastructure.persistence.jpa.strategy;
 
 import org.hibernate.boot.model.naming.Identifier;
