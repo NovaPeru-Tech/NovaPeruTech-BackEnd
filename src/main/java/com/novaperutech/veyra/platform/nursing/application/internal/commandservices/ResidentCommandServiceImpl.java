@@ -126,4 +126,14 @@ public class ResidentCommandServiceImpl implements ResidentCommandServices {
     @Override
     public void handle(AssignedStaffMemberToResidentCommand command) {
     }
+
+    @Override
+    public void handle(ChangeOfRoomForTheResidentCommand command) {
+
+    }
+
+    @Override
+    public void handle(AssignRoomForResidentCommand command) {
+
+    }
 }
