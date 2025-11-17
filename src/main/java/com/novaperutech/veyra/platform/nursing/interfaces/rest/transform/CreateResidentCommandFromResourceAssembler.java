@@ -7,7 +7,7 @@ public class CreateResidentCommandFromResourceAssembler {
     public static CreateResidentCommand toCommandFromResource(CreateResidentResource resource, Long nursingHomeId)
     {
       return new CreateResidentCommand(nursingHomeId,resource.dni(),resource.firstName(),resource.lastName(),resource.birthDate(),
-       resource.Age(),resource.emailAddress(),resource.street(),resource.number(),resource.city(),resource.postalCode(),
+       resource.age(),resource.emailAddress(),resource.street(),resource.number(),resource.city(),resource.postalCode(),
               resource.country(),resource.photo(),resource.phoneNumber()
               ,resource.legalRepresentativeFirstName(),resource.legalRepresentativeLastName(),resource.legalRepresentativePhoneNumber(),
               resource.emergencyContactFirstName(),resource.emergencyContactLastName(),resource.emergencyContactPhoneNumber()
