@@ -99,4 +99,14 @@ public class ContractHistory {
                 .findFirst();
 
     }
+    /**
+     * Get the last added contract.
+     * @return the last contract in the list, or null if empty
+     */
+    public Contract getLastAddedContract() {
+        if (contracts.isEmpty()) {
+            return null;
+        }
+        return contracts.getLast();
+    }
 }

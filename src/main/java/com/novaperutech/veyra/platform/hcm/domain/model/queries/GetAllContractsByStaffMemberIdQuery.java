@@ -1,4 +1,4 @@
 package com.novaperutech.veyra.platform.hcm.domain.model.queries;
 
-public record GetAllContractsByStaffMemberId(Long staffId) {
+public record GetAllContractsByStaffMemberIdQuery(Long staffId) {
 }
