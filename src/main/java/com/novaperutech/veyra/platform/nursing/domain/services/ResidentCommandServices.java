@@ -10,6 +10,4 @@ public interface ResidentCommandServices {
     Optional<Resident>handle(UpdateResidentCommand command);
     void handle (DeleteResidentCommand command);
     void handle(AssignedStaffMemberToResidentCommand command);
-    void handle(ChangeOfRoomForTheResidentCommand command);
-    void handle(AssignRoomForResidentCommand command);
 }
