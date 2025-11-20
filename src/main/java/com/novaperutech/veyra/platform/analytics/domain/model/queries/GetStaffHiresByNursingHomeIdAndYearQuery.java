@@ -1,7 +1,6 @@
 package com.novaperutech.veyra.platform.analytics.domain.model.queries;
 
-import com.novaperutech.veyra.platform.hcm.domain.model.valueobjetcs.NursingHomeId;
-
+import com.novaperutech.veyra.platform.analytics.domain.model.valueobjects.NursingHomeId;
 public record GetStaffHiresByNursingHomeIdAndYearQuery(NursingHomeId nursingHomeId,Integer year) {
     public  GetStaffHiresByNursingHomeIdAndYearQuery{
         if (year==null){
