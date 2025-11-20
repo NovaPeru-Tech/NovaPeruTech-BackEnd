@@ -10,10 +10,11 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface MetricRepository extends JpaRepository<Metric,Long> {
-    List<Metric> findByNursingHomeIdAndMetricTypeAndEventDate(NursingHomeId nursingHomeId, MetricType metricType, LocalDate eventDate);
+    Optional<Metric>findByNursingHomeIdAndMetricTypeAndEventDate(NursingHomeId nursingHomeId, MetricType metricType, LocalDate eventDate);
     @Query("SELECT m FROM Metric m " +"WHERE m.nursingHomeId = :nursingHomeId " +"AND m.metricType = :metricType " +"AND YEAR(m.eventDate) = :year")
     List<Metric> findByNursingHomeIdAndMetricTypeAndYear(@Param("nursingHomeId") NursingHomeId nursingHomeId,@Param("metricType") MetricType metricType,@Param("year") Integer year);
     @Query("SELECT m FROM Metric m " + "WHERE m.nursingHomeId=:nursingHomeId " +"AND m.metricType=:metricType " +"AND YEAR (m.eventDate)=:year "+"AND MONTH (m.eventDate)=:moth")
