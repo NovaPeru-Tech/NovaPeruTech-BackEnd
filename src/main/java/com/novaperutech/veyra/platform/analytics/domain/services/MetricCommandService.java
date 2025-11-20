@@ -1,4 +1,4 @@
-package com.novaperutech.veyra.platform.analytics.domain.service;
+package com.novaperutech.veyra.platform.analytics.domain.services;
 
 import com.novaperutech.veyra.platform.analytics.domain.model.commands.RecordMetricCommand;
 
