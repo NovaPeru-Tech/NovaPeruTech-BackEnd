@@ -2,7 +2,7 @@ package com.novaperutech.veyra.platform.hcm.interfaces.rest;
 
 import com.novaperutech.veyra.platform.hcm.domain.model.queries.GetAllStaffMemberByNursingHomeIdQuery;
 import com.novaperutech.veyra.platform.hcm.domain.model.queries.GetStaffByIdQuery;
-import com.novaperutech.veyra.platform.hcm.domain.model.valueobjetcs.NursingHomeId;
+import com.novaperutech.veyra.platform.hcm.domain.model.valueobjects.NursingHomeId;
 import com.novaperutech.veyra.platform.hcm.domain.services.StaffCommandServices;
 import com.novaperutech.veyra.platform.hcm.domain.services.StaffQueryServices;
 import com.novaperutech.veyra.platform.hcm.interfaces.rest.resources.CreateStaffResource;

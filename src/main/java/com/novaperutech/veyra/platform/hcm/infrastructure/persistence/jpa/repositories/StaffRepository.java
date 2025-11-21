@@ -1,8 +1,8 @@
 package com.novaperutech.veyra.platform.hcm.infrastructure.persistence.jpa.repositories;
 
 import com.novaperutech.veyra.platform.hcm.domain.model.aggregates.Staff;
-import com.novaperutech.veyra.platform.hcm.domain.model.valueobjetcs.NursingHomeId;
-import com.novaperutech.veyra.platform.hcm.domain.model.valueobjetcs.PersonProfileId;
+import com.novaperutech.veyra.platform.hcm.domain.model.valueobjects.NursingHomeId;
+import com.novaperutech.veyra.platform.hcm.domain.model.valueobjects.PersonProfileId;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

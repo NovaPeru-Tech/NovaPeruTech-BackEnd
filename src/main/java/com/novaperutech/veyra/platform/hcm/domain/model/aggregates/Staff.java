@@ -1,13 +1,17 @@
 package com.novaperutech.veyra.platform.hcm.domain.model.aggregates;
-import com.novaperutech.veyra.platform.hcm.domain.model.valueobjetcs.ContractHistory;
-import com.novaperutech.veyra.platform.hcm.domain.model.valueobjetcs.EmergencyContact;
-import com.novaperutech.veyra.platform.hcm.domain.model.valueobjetcs.NursingHomeId;
-import com.novaperutech.veyra.platform.hcm.domain.model.valueobjetcs.PersonProfileId;
+import com.novaperutech.veyra.platform.hcm.domain.model.events.EmployeeHiredEvent;
+import com.novaperutech.veyra.platform.hcm.domain.model.events.EmployeeSuspendedEvent;
+import com.novaperutech.veyra.platform.hcm.domain.model.events.EmployeeTerminationEvent;
+import com.novaperutech.veyra.platform.hcm.domain.model.valueobjects.ContractHistory;
+import com.novaperutech.veyra.platform.hcm.domain.model.valueobjects.EmergencyContact;
+import com.novaperutech.veyra.platform.hcm.domain.model.valueobjects.NursingHomeId;
+import com.novaperutech.veyra.platform.hcm.domain.model.valueobjects.PersonProfileId;
 import com.novaperutech.veyra.platform.shared.domain.model.aggregates.AuditableAbstractAggregateRoot;
 import jakarta.persistence.*;
 import lombok.Getter;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 @Entity
 @Getter
@@ -47,9 +51,23 @@ public Staff(Long personProfileId,String emergencyContactFirstName,String emerge
     public void addContractToHistory(LocalDate startDate, LocalDate endDate,
                                      String typeOfContract, String staffRole, String workShift) {
         this.contractHistory.addContract(this, startDate, endDate, typeOfContract, staffRole, workShift);
+       var aux= this.contractHistory.getLastAddedContract();
+       this.addDomainEvent(new EmployeeHiredEvent(this,this.getId(),aux.getId(),this.nursingHomeId,staffRole,typeOfContract,LocalDate.now()));
     }
 
     public void updateContractStatus(Long contractId, String newStatus) {
         this.contractHistory.updateContractStatus(contractId, newStatus);
+        var contractOptional = this.contractHistory.getContractById(contractId);
+        var contract = contractOptional.orElseThrow(() -> new IllegalArgumentException(
+                "Contract with id " + contractId + " not found in this staff's history"
+        ));
+        String staffRole = contract.getStaffRole() != null ? contract.getStaffRole().name() : null;
+        String typeOfContract = contract.getTypeOfContract() != null ? contract.getTypeOfContract().typeOfContract() : null;
+        if (Objects.equals(newStatus, "TERMINATED")) {
+            this.addDomainEvent(new EmployeeTerminationEvent(this,getId(),contractId,this.nursingHomeId,staffRole,typeOfContract,LocalDate.now()));
+        }
+        else if (Objects.equals(newStatus, "SUSPENDED")){
+            this.addDomainEvent(new EmployeeSuspendedEvent(this,this.getId(),contractId,this.nursingHomeId,staffRole,typeOfContract,LocalDate.now()));
+        }
     }
 }

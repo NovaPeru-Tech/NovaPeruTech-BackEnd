@@ -1,6 +1,6 @@
 package com.novaperutech.veyra.platform.hcm.application.internal.outboundservices.acl;
 
-import com.novaperutech.veyra.platform.hcm.domain.model.valueobjetcs.NursingHomeId;
+import com.novaperutech.veyra.platform.hcm.domain.model.valueobjects.NursingHomeId;
 import com.novaperutech.veyra.platform.nursing.interfaces.acl.NursingContextFacade;
 import org.springframework.stereotype.Service;
 

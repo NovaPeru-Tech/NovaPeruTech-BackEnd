@@ -4,7 +4,7 @@ import com.novaperutech.veyra.platform.hcm.application.internal.outboundservices
 import com.novaperutech.veyra.platform.hcm.application.internal.outboundservices.acl.ExternalProfileService;
 import com.novaperutech.veyra.platform.hcm.domain.model.aggregates.Staff;
 import com.novaperutech.veyra.platform.hcm.domain.model.commands.*;
-import com.novaperutech.veyra.platform.hcm.domain.model.valueobjetcs.EmergencyContact;
+import com.novaperutech.veyra.platform.hcm.domain.model.valueobjects.EmergencyContact;
 import com.novaperutech.veyra.platform.hcm.domain.services.StaffCommandServices;
 import com.novaperutech.veyra.platform.hcm.infrastructure.persistence.jpa.repositories.StaffRepository;
 import org.springframework.stereotype.Service;
