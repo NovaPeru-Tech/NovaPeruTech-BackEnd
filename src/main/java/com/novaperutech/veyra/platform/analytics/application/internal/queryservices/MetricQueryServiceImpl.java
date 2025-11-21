@@ -44,7 +44,7 @@ public class MetricQueryServiceImpl implements MetricQueryService {
 
     @Override
     public List<Metric> handle(GetStaffTerminationsByNursingHomeIdAndYearAndMonthQuery query) {
-        return metricRepository.findByNursingHomeIdAndMetricTypeAndYearAndMonth(query.nursingHomeId(),MetricType.EMPLOYEE_TERMINATED,query.year(),query.moth());
+        return metricRepository.findByNursingHomeIdAndMetricTypeAndYearAndMonth(query.nursingHomeId(),MetricType.EMPLOYEE_TERMINATED,query.year(),query.month());
     }
 
     @Override
@@ -54,6 +54,6 @@ public class MetricQueryServiceImpl implements MetricQueryService {
 
     @Override
     public List<Metric> handle(GetStaffHiresByNursingHomeIdAndYearAndMonthQuery query) {
-        return metricRepository.findByNursingHomeIdAndMetricTypeAndYearAndMonth(query.nursingHomeId(), MetricType.EMPLOYEE_HIRED, query.year(), query.moth());
+        return metricRepository.findByNursingHomeIdAndMetricTypeAndYearAndMonth(query.nursingHomeId(), MetricType.EMPLOYEE_HIRED, query.year(), query.month());
     }
 }
