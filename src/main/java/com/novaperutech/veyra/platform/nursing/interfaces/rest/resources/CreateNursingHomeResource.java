@@ -8,6 +8,6 @@ public record CreateNursingHomeResource(String businessName,
                                         String city,
                                         String postalCode,
                                         String country,
-                                        String photoUrl,
+                                        String photo,
                                         String ruc ) {
 }

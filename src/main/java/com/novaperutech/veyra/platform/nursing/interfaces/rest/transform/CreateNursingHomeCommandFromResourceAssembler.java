@@ -7,6 +7,6 @@ public class CreateNursingHomeCommandFromResourceAssembler {
     public static CreateNursingHomeCommand toCommandFromResource(CreateNursingHomeResource resource)
     {
         return new CreateNursingHomeCommand(resource.businessName(),resource.emailAddress(),resource.phoneNumber(),resource.street()
-        ,resource.number(),resource.city(),resource.postalCode(),resource.country(),resource.photoUrl(),resource.ruc());
+        ,resource.number(),resource.city(),resource.postalCode(),resource.country(),resource.photo(),resource.ruc());
     }
 }
