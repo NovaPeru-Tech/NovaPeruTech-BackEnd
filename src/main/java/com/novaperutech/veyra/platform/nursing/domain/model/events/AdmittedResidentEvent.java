@@ -9,26 +9,21 @@
  * @summary Event emitted upon registering a new resident with related metadata.
  */
 package com.novaperutech.veyra.platform.nursing.domain.model.events;
-
 import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
 
-import java.time.LocalDateTime;
-
+import java.time.LocalDate;
 @Getter
-public class RegisterResidentEvent extends ApplicationEvent {
+public class AdmittedResidentEvent extends ApplicationEvent {
     private final Long residentId;
     private final Long nursingHomeId;
-    private final String nursingHomeName;
-    private final Integer age;
-    private final LocalDateTime registeredAt;
-
-    public RegisterResidentEvent(Object source, Long residentId, Long nursingHomeId, String nursingHomeName, Integer age, LocalDateTime registeredAt) {
+    private final LocalDate occurredOn;
+  private final String residentState;
+    public AdmittedResidentEvent(Object source, Long residentId, Long nursingHomeId, LocalDate occurredOn, String residentState) {
         super(source);
         this.residentId = residentId;
         this.nursingHomeId = nursingHomeId;
-        this.nursingHomeName = nursingHomeName;
-        this.age = age;
-        this.registeredAt = registeredAt;
+        this.occurredOn = occurredOn;
+        this.residentState = residentState;
     }
 }
