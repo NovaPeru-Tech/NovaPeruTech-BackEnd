@@ -17,7 +17,7 @@ public interface MetricRepository extends JpaRepository<Metric,Long> {
     Optional<Metric>findByNursingHomeIdAndMetricTypeAndEventDate(NursingHomeId nursingHomeId, MetricType metricType, LocalDate eventDate);
     @Query("SELECT m FROM Metric m " +"WHERE m.nursingHomeId = :nursingHomeId " +"AND m.metricType = :metricType " +"AND YEAR(m.eventDate) = :year")
     List<Metric> findByNursingHomeIdAndMetricTypeAndYear(@Param("nursingHomeId") NursingHomeId nursingHomeId,@Param("metricType") MetricType metricType,@Param("year") Integer year);
-    @Query("SELECT m FROM Metric m " + "WHERE m.nursingHomeId=:nursingHomeId " +"AND m.metricType=:metricType " +"AND YEAR (m.eventDate)=:year "+"AND MONTH (m.eventDate)=:moth")
+    @Query("SELECT m FROM Metric m " + "WHERE m.nursingHomeId=:nursingHomeId " +"AND m.metricType=:metricType " +"AND YEAR (m.eventDate)=:year "+"AND MONTH (m.eventDate)=:month")
     List<Metric> findByNursingHomeIdAndMetricTypeAndYearAndMonth(@Param("nursingHomeId") NursingHomeId nursingHomeId,@Param("metricType") MetricType metricType,@Param("year") Integer year, @Param("month") Integer month);
     List<Metric> findByNursingHomeIdAndMetricTypeAndEventDateBetween(NursingHomeId nursingHomeId, MetricType metricType, LocalDate eventDateAfter, LocalDate eventDateBefore);
 
