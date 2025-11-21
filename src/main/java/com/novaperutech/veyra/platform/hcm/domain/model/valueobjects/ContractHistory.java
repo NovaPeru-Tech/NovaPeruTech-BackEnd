@@ -1,4 +1,4 @@
-package com.novaperutech.veyra.platform.hcm.domain.model.valueobjetcs;
+package com.novaperutech.veyra.platform.hcm.domain.model.valueobjects;
 
 import com.novaperutech.veyra.platform.hcm.domain.model.aggregates.Staff;
 import com.novaperutech.veyra.platform.hcm.domain.model.entities.Contract;
