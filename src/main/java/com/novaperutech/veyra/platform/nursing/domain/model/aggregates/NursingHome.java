@@ -35,8 +35,8 @@ public class NursingHome extends AuditableAbstractAggregateRoot<NursingHome> {
      * @param capacity the capacity of the room
      * @param type the type of the room
      */
-    public void addRoom(Integer capacity, String type) {
-        this.rooms.addRoom(this, capacity, type);
+    public void addRoom(Integer capacity, String type,String roomNumber) {
+        this.rooms.addRoom(this, capacity, type,roomNumber);
     }
     /**
      * Assign a resident to a room.

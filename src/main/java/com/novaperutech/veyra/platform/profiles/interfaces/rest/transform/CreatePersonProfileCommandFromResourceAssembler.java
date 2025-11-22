@@ -9,7 +9,7 @@ public class CreatePersonProfileCommandFromResourceAssembler {
                 ,resource.firstName()
                 ,resource.lastName(),
                 resource.birthDate(),
-                resource.Age(),
+                resource.age(),
                 resource.emailAddress(),
                 resource.street(),
                 resource.number(),

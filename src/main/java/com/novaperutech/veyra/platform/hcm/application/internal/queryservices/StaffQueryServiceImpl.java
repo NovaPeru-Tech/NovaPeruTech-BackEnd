@@ -23,12 +23,12 @@ public class StaffQueryServiceImpl implements StaffQueryServices {
     }
 
     @Override
-    public List<Staff> handle(GetAllStaffQuery query) {
-        return staffRepository.findAll();
+    public List<Staff> handle(GetAllStaffMemberByNursingHomeIdQuery query) {
+        return staffRepository.findByNursingHomeId(query.nursingHomeId());
     }
 
     @Override
-    public Optional<Contract> handle(GetActiveContractByStaffMemberId query) {
+    public Optional<Contract> handle(GetActiveContractByStaffMemberIdQuery query) {
         Staff staff = staffRepository.findById(query.staffId())
                 .orElseThrow(() -> new IllegalArgumentException("Staff with id " + query.staffId() + " does not exist"));
 
@@ -43,7 +43,7 @@ public class StaffQueryServiceImpl implements StaffQueryServices {
     }
 
     @Override
-    public List<Contract> handle(GetAllContractsByStaffMemberId query) {
+    public List<Contract> handle(GetAllContractsByStaffMemberIdQuery query) {
         Staff staff = staffRepository.findById(query.staffId())
                 .orElseThrow(() -> new IllegalArgumentException(
                         "Staff with id " + query.staffId() + " does not exist"
@@ -53,7 +53,7 @@ public class StaffQueryServiceImpl implements StaffQueryServices {
     }
 
     @Override
-    public Optional<Contract> handle(GetContractByStaffMemberIdAndContractId query) {
+    public Optional<Contract> handle(GetContractByStaffMemberIdAndContractIdQuery query) {
         Staff staff = staffRepository.findById(query.staffMemberId())
                 .orElseThrow(() -> new IllegalArgumentException(
                         "Staff with id " + query.staffMemberId() + " does not exist"
@@ -62,6 +62,10 @@ public class StaffQueryServiceImpl implements StaffQueryServices {
         return staff.getContractHistory().getContractById(query.contractId());
     }
 
+    @Override
+    public Optional<Contract> handle(GetLastAddedContractByStaffMemberIdQuery query) {
+        return staffRepository.findById(query.staffId()).map(staff->staff.getContractHistory().getLastAddedContract());
+    }
 
 
 }

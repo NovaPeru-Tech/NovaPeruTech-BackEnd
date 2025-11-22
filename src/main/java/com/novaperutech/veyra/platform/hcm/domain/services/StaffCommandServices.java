@@ -9,6 +9,6 @@ public interface StaffCommandServices {
     Long handle(CreateStaffCommand command);
     Optional<Staff>handle(UpdateStaffCommand command);
     void handle(DeleteStaffCommand command);
-    Long handle(AddContractToStaffCommand command);
+    void handle(AddContractToStaffMemberCommand command);
     void handle(UpdateContractStatusCommand command);
 }

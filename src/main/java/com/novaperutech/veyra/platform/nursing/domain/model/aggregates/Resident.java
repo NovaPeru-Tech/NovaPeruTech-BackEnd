@@ -1,8 +1,12 @@
 package com.novaperutech.veyra.platform.nursing.domain.model.aggregates;
+import com.novaperutech.veyra.platform.nursing.domain.model.events.AdmittedResidentEvent;
 import com.novaperutech.veyra.platform.nursing.domain.model.valueobjects.*;
 import com.novaperutech.veyra.platform.shared.domain.model.aggregates.AuditableAbstractAggregateRoot;
 import jakarta.persistence.*;
 import lombok.Getter;
+
+import java.time.LocalDate;
+
 @Entity
 @Getter
 public class Resident extends AuditableAbstractAggregateRoot<Resident> {
@@ -54,6 +58,7 @@ public class Resident extends AuditableAbstractAggregateRoot<Resident> {
         this.emergencyContact = emergencyContact;
         this.nursingHome = nursingHome;
         this.residentStatus = ResidentState.ACTIVE;
+       this.addDomainEvent(new AdmittedResidentEvent(this,this.getId(),nursingHome.getId(), LocalDate.now(),residentStatus.name()));
     }
 
     public void activate() {
