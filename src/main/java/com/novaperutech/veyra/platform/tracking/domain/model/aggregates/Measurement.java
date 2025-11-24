@@ -5,6 +5,8 @@ import com.novaperutech.veyra.platform.tracking.domain.model.valueobjects.*;
 import jakarta.persistence.*;
 import lombok.Getter;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Getter
 public class Measurement extends AuditableAbstractAggregateRoot<Measurement> {
@@ -15,6 +17,8 @@ public class Measurement extends AuditableAbstractAggregateRoot<Measurement> {
     @Embedded
     private DeviceId deviceId;
 
+    @Column(nullable = false)
+    private LocalDateTime timestamp;
     @Embedded
     @AttributeOverride(name = "value", column = @Column(name = "heart_rate"))
     private HeartRate heartRate;
@@ -44,17 +48,38 @@ public class Measurement extends AuditableAbstractAggregateRoot<Measurement> {
             DeviceId deviceId,
             HeartRate heartRate,
             BloodPressure bloodPressure,
+            Temperature temperature,
             OxygenSaturation oxygenSaturation,
             RespiratoryRate respiratoryRate) {
 
         this.residentId = residentId;
         this.deviceId = deviceId;
+        this.timestamp = LocalDateTime.now();
         this.heartRate = heartRate;
         this.bloodPressure = bloodPressure;
+        this.temperature = temperature;
         this.oxygenSaturation = oxygenSaturation;
         this.respiratoryRate = respiratoryRate;
     }
 
+    public Measurement(
+            ResidentId residentId,
+            DeviceId deviceId,
+            LocalDateTime timestamp,
+            HeartRate heartRate,
+            BloodPressure bloodPressure,
+            Temperature temperature,
+            OxygenSaturation oxygenSaturation,
+            RespiratoryRate respiratoryRate) {
 
+        this.residentId = residentId;
+        this.deviceId = deviceId;
+        this.timestamp = timestamp;
+        this.heartRate = heartRate;
+        this.bloodPressure = bloodPressure;
+        this.temperature = temperature;
+        this.oxygenSaturation = oxygenSaturation;
+        this.respiratoryRate = respiratoryRate;
+    }
 
 }
