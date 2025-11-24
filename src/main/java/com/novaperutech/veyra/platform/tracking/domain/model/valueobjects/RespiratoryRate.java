@@ -1,0 +1,13 @@
+package com.novaperutech.veyra.platform.tracking.domain.model.valueobjects;
+
+import jakarta.persistence.Embeddable;
+
+@Embeddable
+public record RespiratoryRate(Integer value) {
+
+    public RespiratoryRate {
+        if (value == null || value < 0 || value > 60) {
+            throw new IllegalArgumentException("Respiratory rate must be between 0 and 60 breaths/min");
+        }
+    }
+}
