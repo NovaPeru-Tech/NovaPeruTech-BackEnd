@@ -1,7 +1,9 @@
 package com.novaperutech.veyra.platform.nursing.interfaces.rest;
 
 import com.novaperutech.veyra.platform.nursing.domain.model.queries.GetLastAddedRoomByNursingHomeIdQuery;
+import com.novaperutech.veyra.platform.nursing.domain.model.queries.GetRoomsByStatusAndNursingHomeIdQuery;
 import com.novaperutech.veyra.platform.nursing.domain.model.queries.GetRoomsForNursingHomeIdQuery;
+import com.novaperutech.veyra.platform.nursing.domain.model.valueobjects.RoomStatus;
 import com.novaperutech.veyra.platform.nursing.domain.services.NursingHomeCommandServices;
 import com.novaperutech.veyra.platform.nursing.domain.services.NursingHomeQueryServices;
 import com.novaperutech.veyra.platform.nursing.interfaces.rest.resources.AssignedRoomForResidentResource;
@@ -91,6 +93,20 @@ public class NursingHomeRoomsController {
 
         return ResponseEntity.ok().build();
     }
-
-
+@GetMapping("/{roomStatus}")
+@Operation(summary = "Get rooms by nursing home id and status",description = "Get rooms for a specific nursing home filtered by their status")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",description = "Rooms retrieved successfully"),
+            @ApiResponse(responseCode = "404",description = "Nursing home not found")
+    })
+    public ResponseEntity<List<RoomResource>> getRoomsByNursingHomeIdAndStatus(@PathVariable String roomStatus, @PathVariable Long nursingHomeId)
+    {
+        var query= new GetRoomsByStatusAndNursingHomeIdQuery(RoomStatus.valueOf(roomStatus.toUpperCase()),nursingHomeId);
+        var rooms= nursingHomeQueryServices.handle(query);
+        if (rooms.isEmpty()){
+            return ResponseEntity.notFound().build();
+        }
+        var roomResources= rooms.stream().map(RoomResourceFromEntityAssembler::toResourceFromEntity).toList();
+        return ResponseEntity.ok(roomResources);
+  }
 }

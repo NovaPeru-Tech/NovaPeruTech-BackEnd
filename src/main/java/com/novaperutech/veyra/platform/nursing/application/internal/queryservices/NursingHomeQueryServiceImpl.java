@@ -52,4 +52,12 @@ public class NursingHomeQueryServiceImpl implements NursingHomeQueryServices {
         return nursingHomeRepository.findById(query.nursingHomeId())
                 .map(nursingHome -> nursingHome.getRooms().getLastAddedRoom());
     }
+
+    @Override
+    public List<Room> handle(GetRoomsByStatusAndNursingHomeIdQuery query) {
+        return nursingHomeRepository.findById(query.nursingHomeId())
+                .map(nursingHome -> nursingHome.getRooms().getRoomsByStatus(query.roomStatus()))
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "NursingHome not found with id: " + query.nursingHomeId()));
+    }
 }
