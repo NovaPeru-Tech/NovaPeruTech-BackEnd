@@ -6,6 +6,6 @@ import com.novaperutech.veyra.platform.nursing.interfaces.rest.resources.RoomRes
 public class RoomResourceFromEntityAssembler {
     public static RoomResource toResourceFromEntity(Room entity)
     {
-        return new RoomResource(entity.getId(),entity.getRoomNumber(),entity.getNursingHome().getId(),entity.getRoomOccupancy().capacity(),entity.getType(),entity.getRoomStatus().name());
+        return new RoomResource(entity.getId(),entity.getRoomNumber(),entity.getNursingHome().getId(),entity.getRoomOccupancy().capacity(),entity.getType(),entity.getRoomOccupancy().occupied(),entity.getRoomStatus().name());
     }
 }
