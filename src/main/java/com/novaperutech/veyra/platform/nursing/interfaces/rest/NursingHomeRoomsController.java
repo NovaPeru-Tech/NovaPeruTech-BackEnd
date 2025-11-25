@@ -1,17 +1,22 @@
 package com.novaperutech.veyra.platform.nursing.interfaces.rest;
 
 import com.novaperutech.veyra.platform.nursing.domain.model.queries.GetLastAddedRoomByNursingHomeIdQuery;
+import com.novaperutech.veyra.platform.nursing.domain.model.queries.GetRoomsByStatusAndNursingHomeIdQuery;
 import com.novaperutech.veyra.platform.nursing.domain.model.queries.GetRoomsForNursingHomeIdQuery;
+import com.novaperutech.veyra.platform.nursing.domain.model.valueobjects.RoomStatus;
 import com.novaperutech.veyra.platform.nursing.domain.services.NursingHomeCommandServices;
 import com.novaperutech.veyra.platform.nursing.domain.services.NursingHomeQueryServices;
+import com.novaperutech.veyra.platform.nursing.interfaces.rest.resources.AssignedRoomForResidentResource;
 import com.novaperutech.veyra.platform.nursing.interfaces.rest.resources.CreateRoomResource;
 import com.novaperutech.veyra.platform.nursing.interfaces.rest.resources.RoomResource;
+import com.novaperutech.veyra.platform.nursing.interfaces.rest.transform.AssignedRoomForResidentCommandFromResourceAssembler;
 import com.novaperutech.veyra.platform.nursing.interfaces.rest.transform.CreateRoomCommandFromResourceAssembler;
 import com.novaperutech.veyra.platform.nursing.interfaces.rest.transform.RoomResourceFromEntityAssembler;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -69,4 +74,39 @@ public class NursingHomeRoomsController {
 
         return ResponseEntity.ok(roomResources);
     }
+    @PostMapping("/{residentId}")
+    @Operation(summary = "Assign a resident to a room",
+            description = "Assign a resident to a specific room in the nursing home")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Resident assigned to room successfully"),
+            @ApiResponse(responseCode = "400", description = "Bad request")
+    })
+    public ResponseEntity<Void> assignResidentToRoom(
+            @PathVariable Long nursingHomeId,
+            @PathVariable Long residentId,
+            @Valid @RequestBody AssignedRoomForResidentResource resource) {
+
+        var command = AssignedRoomForResidentCommandFromResourceAssembler
+                .toCommandFromResource(nursingHomeId, residentId, resource);
+
+        nursingHomeCommandServices.handle(command);
+
+        return ResponseEntity.ok().build();
+    }
+@GetMapping("/{roomStatus}")
+@Operation(summary = "Get rooms by nursing home id and status",description = "Get rooms for a specific nursing home filtered by their status")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",description = "Rooms retrieved successfully"),
+            @ApiResponse(responseCode = "404",description = "Nursing home not found")
+    })
+    public ResponseEntity<List<RoomResource>> getRoomsByNursingHomeIdAndStatus(@PathVariable String roomStatus, @PathVariable Long nursingHomeId)
+    {
+        var query= new GetRoomsByStatusAndNursingHomeIdQuery(RoomStatus.valueOf(roomStatus.toUpperCase()),nursingHomeId);
+        var rooms= nursingHomeQueryServices.handle(query);
+        if (rooms.isEmpty()){
+            return ResponseEntity.notFound().build();
+        }
+        var roomResources= rooms.stream().map(RoomResourceFromEntityAssembler::toResourceFromEntity).toList();
+        return ResponseEntity.ok(roomResources);
+  }
 }

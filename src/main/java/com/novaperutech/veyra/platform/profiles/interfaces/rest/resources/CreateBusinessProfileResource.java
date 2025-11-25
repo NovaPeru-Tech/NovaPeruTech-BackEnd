@@ -4,5 +4,5 @@ public record CreateBusinessProfileResource(String businessName,String emailAddr
                                             String number,
                                             String city,
                                             String postalCode,
-                                            String country, String photoUrl, String ruc) {
+                                            String country, String photo, String ruc) {
 }

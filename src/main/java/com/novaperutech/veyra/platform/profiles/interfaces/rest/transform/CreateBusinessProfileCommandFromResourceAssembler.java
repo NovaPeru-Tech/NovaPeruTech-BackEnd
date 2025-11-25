@@ -14,7 +14,7 @@ public class CreateBusinessProfileCommandFromResourceAssembler {
                 resource.city(),
                 resource.postalCode(),
                 resource.country(),
-                resource.photoUrl(),
+                resource.photo(),
                 resource.ruc()        );
     }
 }
