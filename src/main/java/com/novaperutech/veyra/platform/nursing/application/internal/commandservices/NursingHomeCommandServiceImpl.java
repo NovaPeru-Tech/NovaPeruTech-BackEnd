@@ -95,7 +95,7 @@ public class NursingHomeCommandServiceImpl implements NursingHomeCommandServices
             throw new IllegalArgumentException("Room number not found");
         }
         var resident=residentRepository.findById(command.residentId()).orElseThrow(()->new IllegalArgumentException("Resident not found with id:" + command.residentId()));
-        if (residentRepository.existsByIdAndNursingHomeId(command.residentId(), command.nursingHomeId()))
+        if (!residentRepository.existsByIdAndNursingHomeId(command.residentId(), command.nursingHomeId()))
         {
             throw new IllegalArgumentException("resident dont exists in the nursing home");
         }

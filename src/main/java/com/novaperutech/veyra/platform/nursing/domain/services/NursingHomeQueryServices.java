@@ -14,4 +14,5 @@ public interface NursingHomeQueryServices {
     List<Room>handle(GetRoomsForNursingHomeIdQuery query);
     Optional<Room> handle(GetRoomByNursingHomeIdAndRoomNumberQuery query);
     Optional<Room>handle(GetLastAddedRoomByNursingHomeIdQuery query);
+    List<Room>handle(GetRoomsByStatusAndNursingHomeIdQuery query);
 }

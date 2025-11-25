@@ -118,4 +118,14 @@ public class Rooms {
         return rooms.stream()
                 .anyMatch(room -> room.getRoomNumber().equals(roomNumber));
     }
+    /**
+     * Get rooms by status.
+     * @param status the room status to filter by
+     * @return list of rooms with the given status
+     */
+    public List<Room> getRoomsByStatus(RoomStatus status) {
+        return rooms.stream()
+                .filter(room -> room.getRoomStatus() == status)
+                .toList();
+    }
 }
