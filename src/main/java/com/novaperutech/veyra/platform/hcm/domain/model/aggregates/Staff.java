@@ -2,10 +2,7 @@ package com.novaperutech.veyra.platform.hcm.domain.model.aggregates;
 import com.novaperutech.veyra.platform.hcm.domain.model.events.EmployeeHiredEvent;
 import com.novaperutech.veyra.platform.hcm.domain.model.events.EmployeeSuspendedEvent;
 import com.novaperutech.veyra.platform.hcm.domain.model.events.EmployeeTerminationEvent;
-import com.novaperutech.veyra.platform.hcm.domain.model.valueobjects.ContractHistory;
-import com.novaperutech.veyra.platform.hcm.domain.model.valueobjects.EmergencyContact;
-import com.novaperutech.veyra.platform.hcm.domain.model.valueobjects.NursingHomeId;
-import com.novaperutech.veyra.platform.hcm.domain.model.valueobjects.PersonProfileId;
+import com.novaperutech.veyra.platform.hcm.domain.model.valueobjects.*;
 import com.novaperutech.veyra.platform.shared.domain.model.aggregates.AuditableAbstractAggregateRoot;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -31,6 +28,9 @@ public class Staff extends AuditableAbstractAggregateRoot<Staff> {
  @Embedded
  @AttributeOverride(name = "id", column = @Column(name = "person_profile_id"))
 private PersonProfileId personProfileId;
+
+ @Enumerated(EnumType.STRING)
+ private StaffStatus staffStatus;
 public Staff(Long personProfileId,String emergencyContactFirstName,String emergencyContactLastName,String emergencyContactPhoneNumber){
     this();
     this.personProfileId=new PersonProfileId(personProfileId);
@@ -41,6 +41,7 @@ public Staff(Long personProfileId,String emergencyContactFirstName,String emerge
      this.personProfileId=personProfileId;
      this.emergencyContact=emergencyContact;
      this.nursingHomeId=nursingHomeId;
+     this.staffStatus=StaffStatus.INACTIVE;
  }
  public Staff updateEmergencyContact(String emergencyContactFirstName,String emergencyContactLastName,String emergencyContactPhoneNumber)
  {
@@ -53,6 +54,7 @@ public Staff(Long personProfileId,String emergencyContactFirstName,String emerge
         this.contractHistory.addContract(this, startDate, endDate, typeOfContract, staffRole, workShift);
        var aux= this.contractHistory.getLastAddedContract();
        this.addDomainEvent(new EmployeeHiredEvent(this,this.getId(),aux.getId(),this.nursingHomeId,staffRole,typeOfContract,LocalDate.now()));
+       this.staffStatus=StaffStatus.ACTIVE;
     }
 
     public void updateContractStatus(Long contractId, String newStatus) {
