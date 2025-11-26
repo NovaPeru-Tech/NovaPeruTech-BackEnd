@@ -1,27 +1,30 @@
 @startuml
-'https://plantuml.com/class-diagram
+package "HCM" {
+    class "staff" {
+        *id: BIGINT
+        *created_at: DATETIME
+        *updated_at: DATETIME
+        *first_name: VARCHAR
+        *last_name: VARCHAR
+        *phone_number: VARCHAR
+        *person_profile_id: BIGINT
+        *nursing_home_id: BIGINT
+    }
 
-abstract class AbstractList
-abstract AbstractCollection
-interface List
-interface Collection
-
-List <|-- AbstractList
-Collection <|-- AbstractCollection
-
-Collection <|- List
-AbstractCollection <|- AbstractList
-AbstractList <|-- ArrayList
-
-class ArrayList {
-Object[] elementData
-size()
+    class "contracts" {
+        *id: BIGINT
+        *created_at: DATETIME
+        *updated_at: DATETIME
+        *start_date: DATE
+        *end_date: DATE
+        *contract_status: ENUM
+        *staff_role: ENUM
+        *type_of_contract: VARCHAR
+        *work_shift: ENUM
+        *staff_id: BIGINT
+    }
 }
 
-enum TimeUnit {
-DAYS
-HOURS
-MINUTES
-}
+staff "1" -- "0.*" contracts
 
 @enduml
