@@ -1,5 +1,5 @@
 @startuml
-package "HCM" {
+package "hcm" {
     class "staff" {
         *id: BIGINT
         *created_at: DATETIME
