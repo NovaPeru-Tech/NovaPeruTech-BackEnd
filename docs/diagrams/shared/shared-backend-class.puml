@@ -1,27 +1,44 @@
 @startuml
-'https://plantuml.com/class-diagram
+' Bounded Context: shared
 
-abstract class AbstractList
-abstract AbstractCollection
-interface List
-interface Collection
-
-List <|-- AbstractList
-Collection <|-- AbstractCollection
-
-Collection <|- List
-AbstractCollection <|- AbstractList
-AbstractList <|-- ArrayList
-
-class ArrayList {
-Object[] elementData
-size()
+package "domain.model.aggregates" {
+  abstract class AuditableAbstractAggregateRoot {
+    +id : UUID
+    +createdAt : Instant
+    +updatedAt : Instant
+  }
 }
 
-enum TimeUnit {
-DAYS
-HOURS
-MINUTES
+package "domain.model.entities" {
+  class AuditableModel {
+    +createdBy : String
+    +createdAt : Instant
+    +updatedAt : Instant
+  }
 }
+
+package "infrastructure.persistence.jpa.strategy" {
+  interface PhysicalNamingStrategy
+  class SnakeCasePhysicalNamingStrategy <<strategy>>
+}
+
+package "infrastructure.persistence.jpa.configuration.strategy" {
+  class SnakeCaseWithPluralizedTablePhysicalNamingStrategy <<strategy>>
+}
+
+package "infrastructure.documentation.openapi.configuration" {
+  class OpenApiConfiguration <<configuration>>
+}
+
+package "interfaces.rest.resources" {
+  class MessageResource
+}
+
+AuditableModel <|-- AuditableAbstractAggregateRoot
+
+PhysicalNamingStrategy <|.. SnakeCasePhysicalNamingStrategy
+PhysicalNamingStrategy <|.. SnakeCaseWithPluralizedTablePhysicalNamingStrategy
+
+OpenApiConfiguration --> MessageResource : uses
 
 @enduml
