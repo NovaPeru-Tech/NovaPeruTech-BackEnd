@@ -1,27 +1,28 @@
 @startuml
-'https://plantuml.com/class-diagram
+title Bounded Context: IAM
 
-abstract class AbstractList
-abstract AbstractCollection
-interface List
-interface Collection
-
-List <|-- AbstractList
-Collection <|-- AbstractCollection
-
-Collection <|- List
-AbstractCollection <|- AbstractList
-AbstractList <|-- ArrayList
-
-class ArrayList {
-Object[] elementData
-size()
+entity "users" as users {
+  * id : BIGINT
+  --
+  created_at : DATETIME(6)
+  updated_at : DATETIME(6)
+  password   : VARCHAR(120)
+  username   : VARCHAR(50)
 }
 
-enum TimeUnit {
-DAYS
-HOURS
-MINUTES
+entity "roles" as roles {
+  * id : BIGINT
+  --
+  name : ENUM(...)
 }
+
+entity "user_roles" as user_roles {
+  * user_id : BIGINT
+  * role_id : BIGINT
+}
+
+' Relaciones muchos-a-muchos entre users y roles
+users ||--o{ user_roles : "1..*"
+roles ||--o{ user_roles : "1..*"
 
 @enduml
