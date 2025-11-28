@@ -25,5 +25,6 @@ package "hcm" {
     }
 }
 
+staff "1" -- "0.*" contracts
 
 @enduml
