@@ -1,6 +1,6 @@
 package com.novaperutech.veyra.platform.nursing.domain.model.commands;
 
-public record CreateNursingHomeCommand(String businessName,
+public record CreateNursingHomeCommand(Long administratorId,String businessName,
                                        String emailAddress,
                                        String phoneNumber,
                                        String street,
