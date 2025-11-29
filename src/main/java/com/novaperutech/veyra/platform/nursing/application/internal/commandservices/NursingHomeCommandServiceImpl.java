@@ -6,6 +6,7 @@ import com.novaperutech.veyra.platform.nursing.domain.model.commands.CreateARoom
 import com.novaperutech.veyra.platform.nursing.domain.model.commands.AssignRoomForResidentCommand;
 import com.novaperutech.veyra.platform.nursing.domain.model.commands.ChangeOfRoomForTheResidentCommand;
 import com.novaperutech.veyra.platform.nursing.domain.model.commands.CreateNursingHomeCommand;
+import com.novaperutech.veyra.platform.nursing.domain.model.valueobjects.AdministratorId;
 import com.novaperutech.veyra.platform.nursing.domain.services.NursingHomeCommandServices;
 import com.novaperutech.veyra.platform.nursing.infrastructure.persistence.jpa.repositories.NursingHomeRepository;
 import com.novaperutech.veyra.platform.nursing.infrastructure.persistence.jpa.repositories.ResidentRepository;
@@ -24,6 +25,12 @@ public class NursingHomeCommandServiceImpl implements NursingHomeCommandServices
 
     @Override
     public Long handle(CreateNursingHomeCommand command) {
+        var administratorId= new AdministratorId(command.administratorId());
+        var existingNursingHome= nursingHomeRepository.findByAdministratorId(administratorId);
+        if (existingNursingHome.isPresent()){
+            throw new IllegalArgumentException("Nursing home already exists for administrator with id: " + command.administratorId());
+        }
+
         var businessProfileIde= externalProfileService.fetchBusinessProfileByRuc(command.ruc());
         if (businessProfileIde.isEmpty()){
            businessProfileIde= externalProfileService.createBusinessProfile(
@@ -41,7 +48,7 @@ public class NursingHomeCommandServiceImpl implements NursingHomeCommandServices
         if (businessProfileIde.isEmpty()){
             throw new IllegalArgumentException("Unable to create business profile");
         }
-        var nursingHome= new NursingHome(businessProfileIde.get());
+        var nursingHome= new NursingHome(businessProfileIde.get(),administratorId);
         nursingHomeRepository.save(nursingHome);
         return nursingHome.getId();
 
