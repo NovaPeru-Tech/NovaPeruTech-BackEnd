@@ -17,6 +17,21 @@ import java.time.LocalDate;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
+/**
+ * REST controller that exposes analytics endpoints for a nursing home.
+ *
+ * <p>Responsibility: handle HTTP requests under
+ * <code>/api/v1/nursing-homes/{nursingHomeId}/analytics</code> and return
+ * analytics as Resource representations.</p>
+ *
+ * <p>Notes:
+ * <ul>
+ *   <li>Consumes and produces application/json.</li>
+ *   <li>Resources returned are {@link MetricResource} (HTTP representation of Metric aggregates).</li>
+ *   <li>Controller is stateless; all stateful operations are delegated to domain services.</li>
+ * </ul>
+ * </p>
+ */
 @RestController
 @RequestMapping(value = "/api/v1/nursing-homes/{nursingHomeId}/analytics", produces = APPLICATION_JSON_VALUE)
 @Tag(name = "Nursing Homes Analytics")
@@ -28,6 +43,14 @@ public class NursingHomeAnalyticsController {
         this.metricQueryService = metricQueryService;
     }
 
+    /**
+     * Returns aggregated resident admissions analytics for the requested year.
+     *
+     * @param nursingHomeId the identifier of the nursing home (path variable)
+     * @param year the year for which to retrieve admissions analytics
+     * @return 200 OK with a {@link MetricResource} containing labels and values when
+     * metrics are present; 404 Not Found when no metrics exist for the query
+     */
     @GetMapping("/residents/admissions")
     @Operation(
             summary = "Get resident admissions analytics",
@@ -128,6 +151,15 @@ public class NursingHomeAnalyticsController {
         return ResponseEntity.ok(resource);
     }
 
+    /**
+     * Returns resident admissions analytics for a specific month.
+     *
+     * @param nursingHomeId the identifier of the nursing home (path variable)
+     * @param year the year for which to retrieve admissions analytics
+     * @param month the month for which to retrieve admissions analytics
+     * @return 200 OK with a {@link MetricResource} containing labels and values when
+     * metrics are present; 404 Not Found when no metrics exist for the query
+     */
     @GetMapping("/residents/admissions/by-month")
     @Operation(
             summary = "Get resident admissions by specific month",
@@ -155,6 +187,15 @@ public class NursingHomeAnalyticsController {
         return ResponseEntity.ok(resource);
     }
 
+    /**
+     * Returns resident admissions analytics within a date range.
+     *
+     * @param nursingHomeId the identifier of the nursing home (path variable)
+     * @param startDate the start date of the range (inclusive)
+     * @param endDate the end date of the range (inclusive)
+     * @return 200 OK with a {@link MetricResource} containing labels and values when
+     * metrics are present; 404 Not Found when no metrics exist for the query
+     */
     @GetMapping("/residents/admissions/by-date-range")
     @Operation(
             summary = "Get resident admissions by date range",
@@ -182,6 +223,15 @@ public class NursingHomeAnalyticsController {
         return ResponseEntity.ok(resource);
     }
 
+    /**
+     * Returns staff hires analytics for a specific month.
+     *
+     * @param nursingHomeId the identifier of the nursing home (path variable)
+     * @param year the year for which to retrieve hires analytics
+     * @param month the month for which to retrieve hires analytics
+     * @return 200 OK with a {@link MetricResource} containing labels and values when
+     * metrics are present; 404 Not Found when no metrics exist for the query
+     */
     @GetMapping("/staff/hires/by-month")
     @Operation(
             summary = "Get staff hires by specific month",
@@ -209,6 +259,15 @@ public class NursingHomeAnalyticsController {
         return ResponseEntity.ok(resource);
     }
 
+    /**
+     * Returns staff terminations analytics for a specific month.
+     *
+     * @param nursingHomeId the identifier of the nursing home (path variable)
+     * @param year the year for which to retrieve terminations analytics
+     * @param month the month for which to retrieve terminations analytics
+     * @return 200 OK with a {@link MetricResource} containing labels and values when
+     * metrics are present; 404 Not Found when no metrics exist for the query
+     */
     @GetMapping("/staff/terminations/by-month")
     @Operation(
             summary = "Get staff terminations by specific month",
