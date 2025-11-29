@@ -8,6 +8,23 @@ import lombok.Getter;
 
 import java.time.LocalDate;
 
+/**
+ * Domain aggregate that represents an analytics metric for a nursing home.
+ *
+ * <p>Each Metric records the occurrence count (value) of a specific
+ * {@link MetricType} within a given {@link #eventDate} (used for bucketing by
+ * month/year) for a {@link NursingHomeId}.</p>
+ *
+ * <p>Invariants and behavior:
+ * <ul>
+ *   <li>When a metric is first created, its <code>value</code> is initialized to 1.</li>
+ *   <li>Call {@link #incrementValue()} to increment the aggregated count.</li>
+ * </ul>
+ * </p>
+ *
+ * <p>Persistence: this is a JPA entity and an aggregate root; use repository
+ * interfaces to query and persist instances.</p>
+ */
 @Entity
 @Getter
 public class Metric extends AuditableAbstractAggregateRoot<Metric> {
@@ -32,6 +49,10 @@ public class Metric extends AuditableAbstractAggregateRoot<Metric> {
         this.value = 1L;
         this.eventDate=eventDate;
     }
+    /**
+     * Increment the recorded metric value by one. This models an idempotent
+     * aggregation operation when the caller intends to tally occurrences.
+     */
     public void incrementValue() {
         this.value++;
     }

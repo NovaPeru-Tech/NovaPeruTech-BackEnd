@@ -12,6 +12,13 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Repository interface for persisting and querying {@link Metric} aggregates.
+ *
+ * <p>Provides convenience finder methods and custom queries used by the
+ * {@code MetricQueryService} and command services. Query methods return domain
+ * aggregates that can be further processed by the application layer.</p>
+ */
 @Repository
 public interface MetricRepository extends JpaRepository<Metric,Long> {
     Optional<Metric>findByNursingHomeIdAndMetricTypeAndEventDate(NursingHomeId nursingHomeId, MetricType metricType, LocalDate eventDate);
