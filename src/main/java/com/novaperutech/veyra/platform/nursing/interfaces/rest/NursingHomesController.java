@@ -33,7 +33,7 @@ public class NursingHomesController {
         this.nursingHomeQueryServices = nursingHomeQueryServices;
     }
 
-    @PostMapping
+    @PostMapping("/{administratorId}/administrators")
     @Operation(
             summary = "Create a new nursing home",
             description = "Creates a new nursing home with the provided business profile information and returns the created nursing home resource"
@@ -41,8 +41,8 @@ public class NursingHomesController {
             @ApiResponse(responseCode = "201", description = "Nursing home create"),
             @ApiResponse(responseCode = "400",description = "Bad request")
     })
-    public ResponseEntity<NursingHomeResource>createNursingHome(@RequestBody CreateNursingHomeResource resource){
-        var createNursingHomeCommand= CreateNursingHomeCommandFromResourceAssembler.toCommandFromResource(resource);
+    public ResponseEntity<NursingHomeResource>createNursingHome(@RequestBody CreateNursingHomeResource resource, @PathVariable Long administratorId){
+        var createNursingHomeCommand= CreateNursingHomeCommandFromResourceAssembler.toCommandFromResource(resource,administratorId);
         var nursingHomeId=nursingHomeCommandServices.handle(createNursingHomeCommand);
         if (nursingHomeId==null||nursingHomeId==0L){return ResponseEntity.badRequest().build();}
         var getNursingHomeByIdQuery= new GetNursingHomeByIdQuery(nursingHomeId);
