@@ -6,6 +6,6 @@ import com.novaperutech.veyra.platform.nursing.interfaces.rest.resources.Nursing
 public class NursingHomeFromEntityAssembler {
     public static NursingHomeResource toResourceFromEntity(NursingHome entity)
     {
-        return new NursingHomeResource(entity.getId(),entity.getBusinessProfileId().businessProfileId());
+        return new NursingHomeResource(entity.getId(),entity.getBusinessProfileId().businessProfileId(),entity.getAdministratorId().residentId());
     }
 }

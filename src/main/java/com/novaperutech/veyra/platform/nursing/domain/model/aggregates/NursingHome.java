@@ -9,6 +9,7 @@
  */
 package com.novaperutech.veyra.platform.nursing.domain.model.aggregates;
 
+import com.novaperutech.veyra.platform.nursing.domain.model.valueobjects.AdministratorId;
 import com.novaperutech.veyra.platform.nursing.domain.model.valueobjects.BusinessProfileId;
 import com.novaperutech.veyra.platform.nursing.domain.model.valueobjects.Rooms;
 import com.novaperutech.veyra.platform.shared.domain.model.aggregates.AuditableAbstractAggregateRoot;
@@ -22,11 +23,12 @@ public class NursingHome extends AuditableAbstractAggregateRoot<NursingHome> {
 
     @Embedded
     private BusinessProfileId businessProfileId;
-
+      private AdministratorId administratorId;
     public NursingHome() {}
 
-    public NursingHome(BusinessProfileId businessProfileId) {
+    public NursingHome(BusinessProfileId businessProfileId, AdministratorId administratorId) {
         this.businessProfileId = businessProfileId;
+        this.administratorId=administratorId;
     }
     @Embedded
     private Rooms rooms;
