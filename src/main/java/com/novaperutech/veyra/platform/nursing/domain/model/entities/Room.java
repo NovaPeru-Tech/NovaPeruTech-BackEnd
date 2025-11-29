@@ -3,7 +3,6 @@ package com.novaperutech.veyra.platform.nursing.domain.model.entities;
 import com.novaperutech.veyra.platform.nursing.domain.model.aggregates.NursingHome;
 import com.novaperutech.veyra.platform.nursing.domain.model.aggregates.Resident;
 import com.novaperutech.veyra.platform.nursing.domain.model.valueobjects.RoomOccupancy;
-import com.novaperutech.veyra.platform.nursing.domain.model.valueobjects.RoomNumber;
 import com.novaperutech.veyra.platform.nursing.domain.model.valueobjects.RoomStatus;
 import com.novaperutech.veyra.platform.shared.domain.model.entities.AuditableModel;
 import jakarta.persistence.*;
@@ -33,9 +32,9 @@ public class Room extends AuditableModel {
     @JoinColumn(name = "resident_id")
     private Resident resident;
 
-    @Embedded
     @NotNull
-    private RoomNumber roomNumber;
+    @Column(nullable = false)
+    private String roomNumber;
 
     @NotNull
     @Column(nullable = false)
@@ -55,7 +54,6 @@ public class Room extends AuditableModel {
      */
     public Room() {
         super();
-        this.roomNumber = new RoomNumber();
     }
 
     /**
@@ -64,11 +62,12 @@ public class Room extends AuditableModel {
      * @param capacity the capacity of the room
      * @param type the type of the room
      */
-    public Room(NursingHome nursingHome, Integer capacity, String type) {
+    public Room(NursingHome nursingHome, Integer capacity, String type,String roomNumber) {
         this();
         this.nursingHome = nursingHome;
         this.type = type;
         this.roomOccupancy = new RoomOccupancy(capacity, 0);
+        this.roomNumber=roomNumber;
         this.roomStatus = RoomStatus.AVAILABLE;
     }
 

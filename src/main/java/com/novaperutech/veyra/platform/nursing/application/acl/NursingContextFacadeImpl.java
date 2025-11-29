@@ -1,6 +1,7 @@
 package com.novaperutech.veyra.platform.nursing.application.acl;
 
 import com.novaperutech.veyra.platform.nursing.domain.model.queries.GetNursingHomeByIdQuery;
+import com.novaperutech.veyra.platform.nursing.domain.model.queries.GetResidentByIdQuery;
 import com.novaperutech.veyra.platform.nursing.domain.model.queries.GetResidentByPersonProfileQuery;
 import com.novaperutech.veyra.platform.nursing.domain.model.valueobjects.PersonProfileId;
 import com.novaperutech.veyra.platform.nursing.domain.services.NursingHomeQueryServices;
@@ -31,5 +32,12 @@ public class NursingContextFacadeImpl implements NursingContextFacade {
         var query= new GetResidentByPersonProfileQuery(personProfile);
         var residentOpt= residentQueryServices.handle(query);
         return residentOpt.isPresent();
+    }
+
+    @Override
+    public Long fetchResidentById(Long residentId) {
+        var findResidentById= new GetResidentByIdQuery(residentId);
+        var resident= residentQueryServices.handle(findResidentById);
+        return resident.isEmpty()?Long.valueOf(0L):resident.get().getId();
     }
 }

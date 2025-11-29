@@ -6,7 +6,7 @@ import com.novaperutech.veyra.platform.profiles.interfaces.rest.resources.Update
 public class UpdatePersonProfileCommandFromResourceAssembler {
     public static UpdatePersonProfileCommand toCommandFromResource(Long personProfileId, UpdatePersonProfileResource resource){
         return new UpdatePersonProfileCommand(personProfileId,resource.dni(),
-                resource.firstName(),resource.lastName(),resource.birthDate(),resource.Age(),
+                resource.firstName(),resource.lastName(),resource.birthDate(),resource.age(),
                 resource.emailAddress(),resource.street(),resource.number(),resource.city(),resource.postalCode(),resource.country(),resource.photo()
                 ,resource.phoneNumber()
         );

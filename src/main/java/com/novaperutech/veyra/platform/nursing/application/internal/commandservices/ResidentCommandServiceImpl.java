@@ -36,7 +36,7 @@ public class ResidentCommandServiceImpl implements ResidentCommandServices {
                     command.firstName(),
                     command.lastName(),
                     command.birthDate(),
-                    command.Age(),
+                    command.age(),
                     command.emailAddress(),
                     command.street(),
                     command.number(),
@@ -127,13 +127,4 @@ public class ResidentCommandServiceImpl implements ResidentCommandServices {
     public void handle(AssignedStaffMemberToResidentCommand command) {
     }
 
-    @Override
-    public void handle(ChangeOfRoomForTheResidentCommand command) {
-
-    }
-
-    @Override
-    public void handle(AssignRoomForResidentCommand command) {
-
-    }
 }

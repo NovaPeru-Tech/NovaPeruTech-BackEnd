@@ -6,6 +6,6 @@ import com.novaperutech.veyra.platform.hcm.interfaces.rest.resources.StaffResour
 
 public class StaffResourceFromEntityAssembler {
    public static StaffResource toResourceFromEntity(Staff entity){
-       return new StaffResource(entity.getPersonProfileId().id(),entity.getPersonProfileId().id(),entity.getEmergencyContact().firstName(),entity.getEmergencyContact().lastName(),entity.getEmergencyContact().phoneNumber());
+       return new StaffResource(entity.getId(),entity.getPersonProfileId().id(),entity.getStaffStatus().name(),entity.getEmergencyContact().firstName(),entity.getEmergencyContact().lastName(),entity.getEmergencyContact().phoneNumber());
    }
 }

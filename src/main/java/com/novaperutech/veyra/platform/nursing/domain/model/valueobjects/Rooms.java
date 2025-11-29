@@ -41,8 +41,13 @@ public class Rooms {
      * @param capacity the capacity of the room
      * @param type the type of the room
      */
-    public void addRoom(NursingHome nursingHome, Integer capacity, String type) {
-        Room room = new Room(nursingHome, capacity, type);
+    public void addRoom(NursingHome nursingHome, Integer capacity, String type,String roomNumber) {
+        if (existsRoomNumber(roomNumber)) {
+            throw new IllegalArgumentException(
+                    String.format("Room number %s already exists in this nursing home", roomNumber)
+            );
+        }
+        Room room = new Room(nursingHome, capacity, type,roomNumber);
         this.rooms.add(room);
     }
 
@@ -94,5 +99,33 @@ public class Rooms {
      */
     public List<Room> getAllRooms() {
         return rooms;
+    }
+
+
+    public Room getLastAddedRoom() {
+        if (rooms.isEmpty()) {
+            return null;
+        }
+        return rooms.getLast();
+    }
+
+    /**
+     * Check if a room number already exists in this nursing home.
+     * @param roomNumber the room number to check
+     * @return true if exists, false otherwise
+     */
+    public boolean existsRoomNumber(String roomNumber) {
+        return rooms.stream()
+                .anyMatch(room -> room.getRoomNumber().equals(roomNumber));
+    }
+    /**
+     * Get rooms by status.
+     * @param status the room status to filter by
+     * @return list of rooms with the given status
+     */
+    public List<Room> getRoomsByStatus(RoomStatus status) {
+        return rooms.stream()
+                .filter(room -> room.getRoomStatus() == status)
+                .toList();
     }
 }

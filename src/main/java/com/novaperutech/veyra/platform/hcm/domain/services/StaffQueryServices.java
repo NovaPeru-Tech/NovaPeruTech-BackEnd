@@ -9,8 +9,9 @@ import java.util.Optional;
 
 public interface StaffQueryServices {
     Optional<Staff>handle(GetStaffByIdQuery query);
-    List<Staff>handle(GetAllStaffQuery query);
-    Optional<Contract>handle(GetActiveContractByStaffMemberId query);
-    List<Contract>handle(GetAllContractsByStaffMemberId query);
-    Optional<Contract>handle(GetContractByStaffMemberIdAndContractId query);
+    List<Staff>handle(GetAllStaffMemberByNursingHomeIdQuery query);
+    Optional<Contract>handle(GetActiveContractByStaffMemberIdQuery query);
+    List<Contract>handle(GetAllContractsByStaffMemberIdQuery query);
+    Optional<Contract>handle(GetContractByStaffMemberIdAndContractIdQuery query);
+    Optional<Contract>handle(GetLastAddedContractByStaffMemberIdQuery query);
 }
