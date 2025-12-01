@@ -67,9 +67,11 @@ public Staff(Long personProfileId,String emergencyContactFirstName,String emerge
         String typeOfContract = contract.getTypeOfContract() != null ? contract.getTypeOfContract().typeOfContract() : null;
         if (Objects.equals(newStatus, "TERMINATED")) {
             this.addDomainEvent(new EmployeeTerminationEvent(this,getId(),contractId,this.nursingHomeId,staffRole,typeOfContract,LocalDate.now()));
+            this.staffStatus=StaffStatus.INACTIVE;
         }
         else if (Objects.equals(newStatus, "SUSPENDED")){
             this.addDomainEvent(new EmployeeSuspendedEvent(this,this.getId(),contractId,this.nursingHomeId,staffRole,typeOfContract,LocalDate.now()));
+            this.staffStatus=StaffStatus.SUSPENDED;
         }
     }
 }
