@@ -56,4 +56,12 @@ public class MetricQueryServiceImpl implements MetricQueryService {
     public List<Metric> handle(GetStaffHiresByNursingHomeIdAndYearAndMonthQuery query) {
         return metricRepository.findByNursingHomeIdAndMetricTypeAndYearAndMonth(query.nursingHomeId(), MetricType.EMPLOYEE_HIRED, query.year(), query.month());
     }
+    @Override
+    public List<Metric> handle(GetMetricsByNursingHomeIdAndTypeAndYearQuery query) {
+        return metricRepository.findByNursingHomeIdAndMetricTypeAndYear(
+                query.nursingHomeId(),
+                query.metricType(),
+                query.year()
+        );
+    }
 }
