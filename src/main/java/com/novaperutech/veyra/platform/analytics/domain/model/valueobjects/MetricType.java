@@ -1,7 +1,6 @@
 package com.novaperutech.veyra.platform.analytics.domain.model.valueobjects;
 
 public enum MetricType {
-
     RESIDENT_ADMISSION,
     RESIDENT_DECEASED,
     RESIDENT_RETIRED,
@@ -9,5 +8,4 @@ public enum MetricType {
     EMPLOYEE_HIRED,
     EMPLOYEE_TERMINATED,
     EMPLOYEE_SUSPENDED,
-
     }
