@@ -9,11 +9,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.time.LocalDate;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -52,32 +49,6 @@ public class NursingHomeAnalyticsController {
         var resource = MetricResourceFromEntityAssembler.toResourceFromEntityList(metrics);
         return ResponseEntity.ok(resource);
     }
-
-    @GetMapping("/residents/active")
-    @Operation(
-            summary = "Get active residents analytics",
-            description = "Returns analytics for active residents"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Analytics returned successfully"),
-            @ApiResponse(responseCode = "404", description = "No metrics found")
-    })
-    public ResponseEntity<MetricResource> getActiveResidentsAnalytics(
-            @PathVariable Long nursingHomeId,
-            @RequestParam int year) {
-
-        var nursingHomeIdVO = new NursingHomeId(nursingHomeId);
-        var query = new GetResidentActivesByNursingHomeIdAndYearQuery(nursingHomeIdVO, year);
-        var metrics = metricQueryService.handle(query);
-
-        if (metrics.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-
-        var resource = MetricResourceFromEntityAssembler.toResourceFromEntityList(metrics);
-        return ResponseEntity.ok(resource);
-    }
-
     @GetMapping("/staff/hires")
     @Operation(
             summary = "Get staff hires analytics",
@@ -113,119 +84,11 @@ public class NursingHomeAnalyticsController {
             @ApiResponse(responseCode = "404", description = "No metrics found")
     })
     public ResponseEntity<MetricResource> getStaffTerminationsAnalytics(
-            @PathVariable Long  nursingHomeId,
+            @PathVariable Long nursingHomeId,
             @RequestParam int year) {
 
         var nursingHomeIdVO = new NursingHomeId(nursingHomeId);
         var query = new GetStaffTerminationsByNursingHomeIdAndYearQuery(nursingHomeIdVO, year);
-        var metrics = metricQueryService.handle(query);
-
-        if (metrics.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-
-        var resource = MetricResourceFromEntityAssembler.toResourceFromEntityList(metrics);
-        return ResponseEntity.ok(resource);
-    }
-
-    @GetMapping("/residents/admissions/by-month")
-    @Operation(
-            summary = "Get resident admissions by specific month",
-            description = "Returns analytics for a specific month"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Analytics returned successfully"),
-            @ApiResponse(responseCode = "404", description = "No metrics found")
-    })
-    public ResponseEntity<MetricResource> getResidentAdmissionsByMonth(
-            @PathVariable Long nursingHomeId,
-            @RequestParam int year,
-            @RequestParam int month) {
-
-        var nursingHomeIdVO = new NursingHomeId(nursingHomeId);
-        var query = new GetResidentAdmissionsByNursingHomeIdAndYearAndMonthQuery(
-                nursingHomeIdVO, year, month);
-        var metrics = metricQueryService.handle(query);
-
-        if (metrics.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-
-        var resource = MetricResourceFromEntityAssembler.toResourceFromEntityList(metrics);
-        return ResponseEntity.ok(resource);
-    }
-
-    @GetMapping("/residents/admissions/by-date-range")
-    @Operation(
-            summary = "Get resident admissions by date range",
-            description = "Returns analytics within a date range"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Analytics returned successfully"),
-            @ApiResponse(responseCode = "404", description = "No metrics found")
-    })
-    public ResponseEntity<MetricResource> getResidentAdmissionsByDateRange(
-            @PathVariable Long nursingHomeId,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
-
-        var nursingHomeIdVO = new NursingHomeId(nursingHomeId);
-        var query = new GetResidentAdmissionsByNursingHomeIdAndDateRangeQuery(
-                nursingHomeIdVO, startDate, endDate);
-        var metrics = metricQueryService.handle(query);
-
-        if (metrics.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-
-        var resource = MetricResourceFromEntityAssembler.toResourceFromEntityList(metrics);
-        return ResponseEntity.ok(resource);
-    }
-
-    @GetMapping("/staff/hires/by-month")
-    @Operation(
-            summary = "Get staff hires by specific month",
-            description = "Returns analytics for a specific month"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Analytics returned successfully"),
-            @ApiResponse(responseCode = "404", description = "No metrics found")
-    })
-    public ResponseEntity<MetricResource> getStaffHiresByMonth(
-            @PathVariable Long nursingHomeId,
-            @RequestParam int year,
-            @RequestParam int month) {
-
-        var nursingHomeIdVO = new NursingHomeId(nursingHomeId);
-        var query = new GetStaffHiresByNursingHomeIdAndYearAndMonthQuery(
-                nursingHomeIdVO, year, month);
-        var metrics = metricQueryService.handle(query);
-
-        if (metrics.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-
-        var resource = MetricResourceFromEntityAssembler.toResourceFromEntityList(metrics);
-        return ResponseEntity.ok(resource);
-    }
-
-    @GetMapping("/staff/terminations/by-month")
-    @Operation(
-            summary = "Get staff terminations by specific month",
-            description = "Returns analytics for a specific month"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Analytics returned successfully"),
-            @ApiResponse(responseCode = "404", description = "No metrics found")
-    })
-    public ResponseEntity<MetricResource> getStaffTerminationsByMonth(
-            @PathVariable Long nursingHomeId,
-            @RequestParam int year,
-            @RequestParam int month) {
-
-        var nursingHomeIdVO = new NursingHomeId(nursingHomeId);
-        var query = new GetStaffTerminationsByNursingHomeIdAndYearAndMonthQuery(
-                nursingHomeIdVO, year, month);
         var metrics = metricQueryService.handle(query);
 
         if (metrics.isEmpty()) {

@@ -14,5 +14,6 @@ public interface MetricQueryService {
     List<Metric>handle(GetStaffTerminationsByNursingHomeIdAndYearAndMonthQuery query);
     List<Metric>handle(GetStaffHiresByNursingHomeIdAndYearQuery query);
     List<Metric>handle(GetStaffHiresByNursingHomeIdAndYearAndMonthQuery query);
+    List<Metric> handle(GetMetricsByNursingHomeIdAndTypeAndYearQuery query);
 
 }
