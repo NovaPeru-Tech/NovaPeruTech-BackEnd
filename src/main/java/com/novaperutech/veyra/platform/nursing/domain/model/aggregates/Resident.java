@@ -1,4 +1,5 @@
 package com.novaperutech.veyra.platform.nursing.domain.model.aggregates;
+import com.novaperutech.veyra.platform.nursing.domain.model.entities.Room;
 import com.novaperutech.veyra.platform.nursing.domain.model.events.AdmittedResidentEvent;
 import com.novaperutech.veyra.platform.nursing.domain.model.valueobjects.*;
 import com.novaperutech.veyra.platform.shared.domain.model.aggregates.AuditableAbstractAggregateRoot;
@@ -42,6 +43,9 @@ public class Resident extends AuditableAbstractAggregateRoot<Resident> {
     private ResidentState residentStatus;
     @Embedded
     private StaffMemberId staffMemberId;
+    @ManyToOne
+    @JoinColumn(name = "room_id")
+    private Room room;
 
     public Resident(Long personProfileId, String legalRepresentativeFirstName, String legalRepresentativeLastName, String legalRepresentativePhoneNumber
             , String emergencyContactFirstName, String emergencyContactLastName, String emergencyContactPhoneNumber) {
@@ -60,6 +64,62 @@ public class Resident extends AuditableAbstractAggregateRoot<Resident> {
         this.residentStatus = ResidentState.ACTIVE;
        this.addDomainEvent(new AdmittedResidentEvent(this,this.getId(),nursingHome.getId(), LocalDate.now(),residentStatus.name()));
     }
+    /**
+     * Assign this resident to a room.
+     * @param room the room to assign
+     * @throws IllegalStateException if resident is not active or already assigned
+     */
+    public void assignToRoom(Room room) {
+        if (!this.isActive()) {
+            throw new IllegalStateException("Cannot assign inactive resident to a room");
+        }
+        if (this.room != null) {
+            throw new IllegalStateException("Resident is already assigned to room: " + this.room.getRoomNumber());
+        }
+        if (!room.hasAvailableSlots()) {
+            throw new IllegalStateException("Room " + room.getRoomNumber() + " has no available slots");
+        }
+
+        this.room = room;
+        room.occupySlot();
+    }
+
+    /**
+     * Change resident to a different room.
+     * @param newRoom the new room
+     * @throws IllegalStateException if not currently assigned or new room is full
+     */
+    public void changeRoom(Room newRoom) {
+        if (this.room == null) {
+            throw new IllegalStateException("Resident is not currently assigned to any room");
+        }
+        if (!newRoom.hasAvailableSlots()) {
+            throw new IllegalStateException("Room " + newRoom.getRoomNumber() + " has no available slots");
+        }
+        if (this.room.equals(newRoom)) {
+            throw new IllegalStateException("Resident is already in this room");
+        }
+
+        Room oldRoom = this.room;
+        this.room = newRoom;
+
+        oldRoom.releaseSlot();
+        newRoom.occupySlot();
+    }
+
+    /**
+     * Remove resident from their current room.
+     * Should be called when resident retires or is deceased.
+     */
+    public void leaveRoom() {
+        if (this.room == null) {
+            throw new IllegalStateException("Resident is not assigned to any room");
+        }
+
+        this.room.releaseSlot();
+        this.room = null;
+    }
+
 
     public void activate() {
         if (this.residentStatus == ResidentState.ACTIVE) {
@@ -87,6 +147,9 @@ public class Resident extends AuditableAbstractAggregateRoot<Resident> {
                     "Can only suspend an active resident. Current status: " + this.residentStatus
             );
         }
+        if (this.room != null) {
+            this.leaveRoom();
+        }
         this.residentStatus = ResidentState.RETIRED;
     }
 
@@ -101,6 +164,9 @@ public class Resident extends AuditableAbstractAggregateRoot<Resident> {
             throw new IllegalStateException(
                     "Can only suspend an active resident. Current status: " + this.residentStatus
             );
+        }
+        if (this.room != null) {
+            this.leaveRoom();
         }
         this.residentStatus = ResidentState.DECEASED;
     }

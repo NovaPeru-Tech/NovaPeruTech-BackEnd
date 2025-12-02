@@ -9,6 +9,5 @@ import com.novaperutech.veyra.platform.nursing.domain.model.commands.CreateNursi
 public interface NursingHomeCommandServices {
     Long handle (CreateNursingHomeCommand command);
     void handle(CreateARoomToTheNursingHomeCommand command);
-    void handle(ChangeOfRoomForTheResidentCommand command);
-    void handle(AssignRoomForResidentCommand command);
+
 }

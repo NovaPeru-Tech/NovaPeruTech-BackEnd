@@ -3,30 +3,28 @@ package com.novaperutech.veyra.platform.nursing.application.internal.commandserv
 import com.novaperutech.veyra.platform.nursing.application.internal.outboundservices.acl.ExternalProfileService;
 import com.novaperutech.veyra.platform.nursing.domain.model.aggregates.NursingHome;
 import com.novaperutech.veyra.platform.nursing.domain.model.commands.CreateARoomToTheNursingHomeCommand;
-import com.novaperutech.veyra.platform.nursing.domain.model.commands.AssignRoomForResidentCommand;
-import com.novaperutech.veyra.platform.nursing.domain.model.commands.ChangeOfRoomForTheResidentCommand;
+
 import com.novaperutech.veyra.platform.nursing.domain.model.commands.CreateNursingHomeCommand;
-import com.novaperutech.veyra.platform.nursing.domain.model.valueobjects.AdministratorId;
 import com.novaperutech.veyra.platform.nursing.domain.services.NursingHomeCommandServices;
+import com.novaperutech.veyra.platform.nursing.infrastructure.persistence.jpa.repositories.AdministratorRepository;
 import com.novaperutech.veyra.platform.nursing.infrastructure.persistence.jpa.repositories.NursingHomeRepository;
-import com.novaperutech.veyra.platform.nursing.infrastructure.persistence.jpa.repositories.ResidentRepository;
 import org.springframework.stereotype.Service;
 
 @Service
 public class NursingHomeCommandServiceImpl implements NursingHomeCommandServices {
     private final NursingHomeRepository nursingHomeRepository;
    private final ExternalProfileService externalProfileService;
-   private final ResidentRepository residentRepository;
-    public NursingHomeCommandServiceImpl(NursingHomeRepository nursingHomeRepository, ExternalProfileService externalProfileService, ResidentRepository residentRepository) {
+   private final AdministratorRepository administratorRepository;
+    public NursingHomeCommandServiceImpl(NursingHomeRepository nursingHomeRepository, ExternalProfileService externalProfileService,  AdministratorRepository administratorRepository) {
         this.nursingHomeRepository = nursingHomeRepository;
         this.externalProfileService = externalProfileService;
-        this.residentRepository = residentRepository;
+        this.administratorRepository = administratorRepository;
     }
 
     @Override
     public Long handle(CreateNursingHomeCommand command) {
-        var administratorId= new AdministratorId(command.administratorId());
-        var existingNursingHome= nursingHomeRepository.findByAdministratorId(administratorId);
+        var administratorId= administratorRepository.findById(command.administratorId()).orElseThrow(()->new IllegalArgumentException("administrator dont exists"));
+        var existingNursingHome= nursingHomeRepository.findByAdministratorId(administratorId.getId());
         if (existingNursingHome.isPresent()){
             throw new IllegalArgumentException("Nursing home already exists for administrator with id: " + command.administratorId());
         }
@@ -66,48 +64,5 @@ public class NursingHomeCommandServiceImpl implements NursingHomeCommandServices
             throw new IllegalArgumentException("Error while adding room: %s".formatted(e.getMessage()));
         }
     }
-    @Override
-    public void handle(ChangeOfRoomForTheResidentCommand command) {
-        var nursingHome = nursingHomeRepository.findById(command.nursingHomeId())
-                .orElseThrow(() -> new IllegalArgumentException("Nursing home not found with id: " + command.nursingHomeId()));
 
-        var resident = residentRepository.findById(command.residentId())
-                .orElseThrow(() -> new IllegalArgumentException("Resident not found with id: " + command.residentId()));
-
-        if (residentRepository.existsByIdAndNursingHomeId(command.residentId(), command.nursingHomeId())) {
-            throw new IllegalArgumentException("Resident does not exist in this nursing home");
-        }
-
-        var currentRoom = nursingHome.getRooms().getAllRooms().stream()
-                .filter(room -> room.getResident() != null && room.getResident().getId().equals(resident.getId()))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Resident is not currently assigned to any room"));
-
-        var newRoom = nursingHome.getRooms().getRoomByRoomNumber(command.newRoomNumber());
-        if (newRoom == null) {
-            throw new IllegalArgumentException("New room not found with number: " + command.newRoomNumber());
-        }
-
-        currentRoom.removeResident();
-        newRoom.assignResident(resident);
-
-        nursingHomeRepository.save(nursingHome);
-    }
-
-    @Override
-    public void handle(AssignRoomForResidentCommand command) {
-        var nursingHome=nursingHomeRepository.findById(command.nursingHomeId()).orElseThrow(()-> new IllegalArgumentException("NursingHome not found with id:" + command.nursingHomeId()));
-        var room= nursingHome.getRooms().getRoomByRoomNumber(command.roomNumber());
-        if (room==null){
-            throw new IllegalArgumentException("Room number not found");
-        }
-        var resident=residentRepository.findById(command.residentId()).orElseThrow(()->new IllegalArgumentException("Resident not found with id:" + command.residentId()));
-        if (!residentRepository.existsByIdAndNursingHomeId(command.residentId(), command.nursingHomeId()))
-        {
-            throw new IllegalArgumentException("resident dont exists in the nursing home");
-        }
-        room.assignResident(resident);
-        nursingHomeRepository.save(nursingHome);
-
-    }
 }
