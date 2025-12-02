@@ -9,26 +9,29 @@
  */
 package com.novaperutech.veyra.platform.nursing.domain.model.aggregates;
 
-import com.novaperutech.veyra.platform.nursing.domain.model.valueobjects.AdministratorId;
 import com.novaperutech.veyra.platform.nursing.domain.model.valueobjects.BusinessProfileId;
 import com.novaperutech.veyra.platform.nursing.domain.model.valueobjects.Rooms;
 import com.novaperutech.veyra.platform.shared.domain.model.aggregates.AuditableAbstractAggregateRoot;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 
 @Entity
 @Getter
 public class NursingHome extends AuditableAbstractAggregateRoot<NursingHome> {
-
+    @JoinColumn(name = "administrator_Id")
+    @ManyToOne
+    private Administrator administrator;
     @Embedded
     private BusinessProfileId businessProfileId;
-      private AdministratorId administratorId;
+
     public NursingHome() {}
 
-    public NursingHome(BusinessProfileId businessProfileId, AdministratorId administratorId) {
+    public NursingHome(BusinessProfileId businessProfileId, Administrator administrator) {
         this.businessProfileId = businessProfileId;
-        this.administratorId=administratorId;
+        this.administrator=administrator;
     }
     @Embedded
     private Rooms rooms;
@@ -39,23 +42,5 @@ public class NursingHome extends AuditableAbstractAggregateRoot<NursingHome> {
      */
     public void addRoom(Integer capacity, String type,String roomNumber) {
         this.rooms.addRoom(this, capacity, type,roomNumber);
-    }
-    /**
-     * Assign a resident to a room.
-     * @param roomNumber the room number
-     * @param resident the resident to assign
-     */
-    public void assignResidentToRoom(String roomNumber, Resident resident) {
-        var room = this.rooms.getRoomByRoomNumber(roomNumber);
-        room.assignResident(resident);
-    }
-    /**
-     * Change resident in a room.
-     * @param roomNumber the room number
-     * @param newResident the new resident
-     */
-    public void changeResidentInRoom(String roomNumber, Resident newResident) {
-        var room = this.rooms.getRoomByRoomNumber(roomNumber);
-        room.changeResident(newResident);
     }
 }
