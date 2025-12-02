@@ -6,6 +6,7 @@ import com.novaperutech.veyra.platform.nursing.domain.model.queries.GetRoomsForN
 import com.novaperutech.veyra.platform.nursing.domain.model.valueobjects.RoomStatus;
 import com.novaperutech.veyra.platform.nursing.domain.services.NursingHomeCommandServices;
 import com.novaperutech.veyra.platform.nursing.domain.services.NursingHomeQueryServices;
+import com.novaperutech.veyra.platform.nursing.domain.services.ResidentCommandServices;
 import com.novaperutech.veyra.platform.nursing.interfaces.rest.resources.AssignedRoomForResidentResource;
 import com.novaperutech.veyra.platform.nursing.interfaces.rest.resources.CreateRoomResource;
 import com.novaperutech.veyra.platform.nursing.interfaces.rest.resources.RoomResource;
@@ -24,16 +25,17 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-@CrossOrigin(origins = {"http://localhost:4200"})@Tag(name = "Nursing Homes")
+@Tag(name = "Nursing Homes")
 @RestController
 @RequestMapping(value = "/api/v1/nursing-homes/{nursingHomeId}/rooms", produces = APPLICATION_JSON_VALUE)
 public class NursingHomeRoomsController {
-
+private final ResidentCommandServices residentCommandServices;
     private final NursingHomeCommandServices nursingHomeCommandServices;
     private final NursingHomeQueryServices nursingHomeQueryServices;
 
-    public NursingHomeRoomsController(NursingHomeCommandServices nursingHomeCommandServices,
+    public NursingHomeRoomsController(ResidentCommandServices residentCommandServices, NursingHomeCommandServices nursingHomeCommandServices,
                                       NursingHomeQueryServices nursingHomeQueryServices) {
+        this.residentCommandServices = residentCommandServices;
         this.nursingHomeCommandServices = nursingHomeCommandServices;
         this.nursingHomeQueryServices = nursingHomeQueryServices;
     }
@@ -89,7 +91,7 @@ public class NursingHomeRoomsController {
         var command = AssignedRoomForResidentCommandFromResourceAssembler
                 .toCommandFromResource(nursingHomeId, residentId, resource);
 
-        nursingHomeCommandServices.handle(command);
+        residentCommandServices.handle(command);
 
         return ResponseEntity.ok().build();
     }

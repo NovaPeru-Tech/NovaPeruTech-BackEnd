@@ -28,10 +28,6 @@ public class Room extends AuditableModel {
     @NotNull
     private NursingHome nursingHome;
 
-    @ManyToOne
-    @JoinColumn(name = "resident_id")
-    private Resident resident;
-
     @NotNull
     @Column(nullable = false)
     private String roomNumber;
@@ -49,84 +45,66 @@ public class Room extends AuditableModel {
     @Column(nullable = false)
     private RoomStatus roomStatus;
 
-    /**
-     * Default constructor.
-     */
     public Room() {
         super();
     }
 
-    /**
-     * Constructor with nursing home, capacity, and type.
-     * @param nursingHome the nursing home
-     * @param capacity the capacity of the room
-     * @param type the type of the room
-     */
-    public Room(NursingHome nursingHome, Integer capacity, String type,String roomNumber) {
+    public Room(NursingHome nursingHome, Integer capacity, String type, String roomNumber) {
         this();
         this.nursingHome = nursingHome;
         this.type = type;
         this.roomOccupancy = new RoomOccupancy(capacity, 0);
-        this.roomNumber=roomNumber;
+        this.roomNumber = roomNumber;
         this.roomStatus = RoomStatus.AVAILABLE;
     }
 
     /**
-     * Assign a resident to the room.
-     * @param resident the resident to assign
-     * @throws IllegalStateException if room is not available or at full capacity
+     * Occupy a slot in the room.
+     * Called when a resident is assigned to this room.
      */
-    public void assignResident(Resident resident) {
-        if (this.roomStatus != RoomStatus.AVAILABLE) {
-            throw new IllegalStateException("Room is not available");
-        }
+    public void occupySlot() {
         if (this.roomOccupancy.isFull()) {
             throw new IllegalStateException("Room is at full capacity");
         }
-
-        this.resident = resident;
         this.roomOccupancy = this.roomOccupancy.incrementOccupiedSlots(1);
-
-        if (this.roomOccupancy.isFull()) {
-            this.roomStatus = RoomStatus.OCCUPIED;
-        }
+        updateStatus();
     }
 
     /**
-     * Change the resident assigned to this room.
-     * @param newResident the new resident
-     * @throws IllegalStateException if no resident is currently assigned
+     * Release a slot in the room.
+     * Called when a resident leaves this room.
      */
-    public void changeResident(Resident newResident) {
-        if (this.resident == null) {
-            throw new IllegalStateException("No resident currently assigned to this room");
+    public void releaseSlot() {
+        if (this.roomOccupancy.occupied() == 0) {
+            throw new IllegalStateException("No occupied slots to release");
         }
-        this.resident = newResident;
-    }
-
-    /**
-     * Remove the resident from the room.
-     * @throws IllegalStateException if no resident is currently assigned
-     */
-    public void removeResident() {
-        if (this.resident == null) {
-            throw new IllegalStateException("No resident currently assigned to this room");
-        }
-
-        this.resident = null;
         this.roomOccupancy = this.roomOccupancy.release(1);
+        updateStatus();
+    }
 
-        if (!this.roomOccupancy.isFull()) {
+    private void updateStatus() {
+        if (this.roomOccupancy.occupied() == 0) {
             this.roomStatus = RoomStatus.AVAILABLE;
+        } else if (this.roomOccupancy.isFull()) {
+            this.roomStatus = RoomStatus.OCCUPIED;
+        } else {
+            this.roomStatus = RoomStatus.PARTIALLY_OCCUPIED;
         }
     }
 
-    /**
-     * Check if the room is available for assignment.
-     * @return true if available, false otherwise
-     */
-    public boolean isAvailable() {
-        return this.roomStatus == RoomStatus.AVAILABLE && !this.roomOccupancy.isFull();
+    public boolean hasAvailableSlots() {
+        return this.roomOccupancy.availableSlots() > 0;
     }
 
+    public boolean isAvailable() {
+        return hasAvailableSlots();
+    }
+
+    public Integer getOccupiedSlots() {
+        return this.roomOccupancy.occupied();
+    }
+
+    public Integer getCapacity() {
+        return this.roomOccupancy.capacity();
+    }
 }
