@@ -60,4 +60,9 @@ public class NursingHomeQueryServiceImpl implements NursingHomeQueryServices {
                 .orElseThrow(() -> new IllegalArgumentException(
                         "NursingHome not found with id: " + query.nursingHomeId()));
     }
+
+    @Override
+    public Optional<NursingHome> handle(GetNursingHomeByAdministratorIdQuery query) {
+        return nursingHomeRepository.findByAdministratorId(query.administratorId());
+    }
 }

@@ -1,6 +1,12 @@
 package com.novaperutech.veyra.platform.nursing.domain.model.queries;
 
-import com.novaperutech.veyra.platform.nursing.domain.model.valueobjects.AdministratorId;
-
-public record GetNursingHomeByAdministratorIdQuery(AdministratorId administratorId) {
+public record GetNursingHomeByAdministratorIdQuery(Long administratorId) {
+    public GetNursingHomeByAdministratorIdQuery{
+        if (administratorId == null) {
+            throw new IllegalArgumentException("administratorId cannot be null");
+        }
+        if (administratorId < 1) {
+            throw new IllegalArgumentException("administratorId cannot be less than 1");
+        }
+    }
 }

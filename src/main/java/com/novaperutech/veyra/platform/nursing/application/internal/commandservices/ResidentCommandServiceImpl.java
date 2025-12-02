@@ -126,5 +126,61 @@ public class ResidentCommandServiceImpl implements ResidentCommandServices {
     @Override
     public void handle(AssignedStaffMemberToResidentCommand command) {
     }
+    @Override
+    public void handle(AssignRoomForResidentCommand command) {
+        var nursingHome = nursingHomeRepository.findById(command.nursingHomeId())
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Nursing home not found with id: " + command.nursingHomeId()));
 
+        var resident = residentRepository.findById(command.residentId())
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Resident not found with id: " + command.residentId()));
+
+        if (!resident.getNursingHome().getId().equals(command.nursingHomeId())) {
+            throw new IllegalArgumentException(
+                    "Resident does not belong to this nursing home");
+        }
+
+        var room = nursingHome.getRooms().getRoomByRoomNumber(command.roomNumber());
+        if (room == null) {
+            throw new IllegalArgumentException(
+                    "Room not found with number: " + command.roomNumber());
+        }
+
+        resident.assignToRoom(room);
+
+        residentRepository.save(resident);
+        nursingHomeRepository.save(nursingHome);
+    }
+
+    @Override
+    public void handle(ChangeOfRoomForTheResidentCommand command) {
+        var nursingHome = nursingHomeRepository.findById(command.nursingHomeId())
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Nursing home not found with id: " + command.nursingHomeId()));
+        var resident = residentRepository.findById(command.residentId())
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Resident not found with id: " + command.residentId()));
+
+        if (!resident.getNursingHome().getId().equals(command.nursingHomeId())) {
+            throw new IllegalArgumentException(
+                    "Resident does not belong to this nursing home");
+        }
+        if (resident.getRoom() == null) {
+            throw new IllegalArgumentException(
+                    "Resident is not currently assigned to any room");
+        }
+        var newRoom = nursingHome.getRooms().getRoomByRoomNumber(command.newRoomNumber());
+        if (newRoom == null) {
+            throw new IllegalArgumentException(
+                    "New room not found with number: " + command.newRoomNumber());
+        }
+        if (resident.getRoom().getRoomNumber().equals(command.newRoomNumber())) {
+            throw new IllegalArgumentException(
+                    "Resident is already in room: " + command.newRoomNumber());
+        }
+        resident.changeRoom(newRoom);
+        residentRepository.save(resident);
+        nursingHomeRepository.save(nursingHome);
+    }
 }
