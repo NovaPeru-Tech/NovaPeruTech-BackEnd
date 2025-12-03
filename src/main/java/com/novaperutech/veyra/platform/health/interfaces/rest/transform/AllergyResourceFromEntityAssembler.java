@@ -1,6 +1,6 @@
 package com.novaperutech.veyra.platform.health.interfaces.rest.transform;
 
-import com.novaperutech.veyra.platform.health.domain.model.aggreagtes.Allergy;
+import com.novaperutech.veyra.platform.health.domain.model.aggregates.Allergy;
 import com.novaperutech.veyra.platform.health.interfaces.rest.resources.AllergyResource;
 
 public class AllergyResourceFromEntityAssembler {
