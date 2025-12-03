@@ -76,31 +76,5 @@ public class NursingHomeResidentsController {
 
         return ResponseEntity.ok(residentResources);
     }
-
-
-
-    @GetMapping("/active")
-    @Operation(summary = "Get all active residents by nursing home")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Actives  retrieved successfully"),
-            @ApiResponse(responseCode = "404", description = "Nursing home not found")
-    })
-    @Parameter(name = "nursingHomeId", description = "The unique identifier of the nursing home", required = true)
-    public ResponseEntity<List<ResidentResource>> getAllActiveResidents(@PathVariable Long nursingHomeId) {
-
-        var existsByNursingHomeIdQuery = new ExistsByNursingHomeIdQuery(nursingHomeId);
-        if (!nursingHomeQueryServices.handle(existsByNursingHomeIdQuery)) {
-            return ResponseEntity.notFound().build();
-        }
-
-        var getActiveResidentsQuery = new GetActiveResidentsByNursingHomeId(nursingHomeId);
-        var activeResidents = residentQueryServices.handle(getActiveResidentsQuery);
-
-        var residentResources = activeResidents.stream()
-                .map(ResidentResourceFromEntityAssembler::toResourceFromEntity)
-                .toList();
-
-        return ResponseEntity.ok(residentResources);
-    }
 }
 
