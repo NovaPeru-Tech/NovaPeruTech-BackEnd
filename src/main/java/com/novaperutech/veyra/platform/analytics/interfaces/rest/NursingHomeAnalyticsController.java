@@ -16,7 +16,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
 @RequestMapping(value = "/api/v1/nursing-homes/{nursingHomeId}/analytics", produces = APPLICATION_JSON_VALUE)
-@Tag(name = "Nursing Homes Analytics")
+@Tag(name = "Nursing Homes")
 public class NursingHomeAnalyticsController {
 
     private final MetricQueryService metricQueryService;
@@ -25,7 +25,7 @@ public class NursingHomeAnalyticsController {
         this.metricQueryService = metricQueryService;
     }
 
-    @GetMapping("/residents/admissions")
+    @GetMapping("/residents-admissions")
     @Operation(
             summary = "Get resident admissions analytics",
             description = "Returns aggregated analytics for resident admissions ready for charts"
@@ -49,7 +49,7 @@ public class NursingHomeAnalyticsController {
         var resource = MetricResourceFromEntityAssembler.toResourceFromEntityList(metrics);
         return ResponseEntity.ok(resource);
     }
-    @GetMapping("/staff/hires")
+    @GetMapping("/staff-hires")
     @Operation(
             summary = "Get staff hires analytics",
             description = "Returns analytics for staff hires"
@@ -74,7 +74,7 @@ public class NursingHomeAnalyticsController {
         return ResponseEntity.ok(resource);
     }
 
-    @GetMapping("/staff/terminations")
+    @GetMapping("/staff-terminations")
     @Operation(
             summary = "Get staff terminations analytics",
             description = "Returns analytics for staff terminations"

@@ -1,4 +1,4 @@
-package com.novaperutech.veyra.platform.health.domain.model.aggreagtes;
+package com.novaperutech.veyra.platform.health.domain.model.aggregates;
 
 import com.novaperutech.veyra.platform.health.domain.model.valueobjects.ResidentId;
 import com.novaperutech.veyra.platform.health.domain.model.valueobjects.SeverityLevel;
