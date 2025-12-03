@@ -1,6 +1,6 @@
 package com.novaperutech.veyra.platform.health.application.internal.commandservices;
 import com.novaperutech.veyra.platform.health.application.internal.outboundservices.acl.ExternalNursingService;
-import com.novaperutech.veyra.platform.health.domain.model.aggreagtes.Allergy;
+import com.novaperutech.veyra.platform.health.domain.model.aggregates.Allergy;
 import com.novaperutech.veyra.platform.health.domain.model.commands.RegisterAllergyCommand;
 import com.novaperutech.veyra.platform.health.domain.model.valueobjects.SeverityLevel;
 import com.novaperutech.veyra.platform.health.domain.model.valueobjects.TypeOfAllergy;

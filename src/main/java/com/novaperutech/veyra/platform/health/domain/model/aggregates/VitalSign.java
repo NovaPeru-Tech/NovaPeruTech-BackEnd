@@ -1,4 +1,4 @@
-package com.novaperutech.veyra.platform.health.domain.model.aggreagtes;
+package com.novaperutech.veyra.platform.health.domain.model.aggregates;
 import com.novaperutech.veyra.platform.health.domain.model.valueobjects.MeasurementId;
 import com.novaperutech.veyra.platform.health.domain.model.valueobjects.SeverityLevel;
 import com.novaperutech.veyra.platform.shared.domain.model.aggregates.AuditableAbstractAggregateRoot;
