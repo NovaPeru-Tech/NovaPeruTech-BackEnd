@@ -1,6 +1,6 @@
 package com.novaperutech.veyra.platform.health.domain.services;
 
-import com.novaperutech.veyra.platform.health.domain.model.aggreagtes.Allergy;
+import com.novaperutech.veyra.platform.health.domain.model.aggregates.Allergy;
 import com.novaperutech.veyra.platform.health.domain.model.queries.ExistsAllergyByResidentIdQuery;
 import com.novaperutech.veyra.platform.health.domain.model.queries.GetAllergiesByResidentIdQuery;
 import com.novaperutech.veyra.platform.health.domain.model.queries.GetAllergyByIdQuery;
