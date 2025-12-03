@@ -19,5 +19,10 @@
       "name": "authorization.jwt.expiration.days",
       "type": "java.lang.String",
       "description": "The number of days before a JWT token expires."
+    },
+    {
+      "name": "environment.name",
+      "type": "java.lang.String",
+      "description": "Description for environment.name."
     }
   ] }
