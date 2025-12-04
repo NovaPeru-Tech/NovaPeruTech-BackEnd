@@ -17,5 +17,4 @@ public class ExternalNursingService {
         var query= nursingContextFacade.fetchResidentById(residentId);
         return query==0L?Optional.empty():Optional.of(new ResidentId(query));
     }
-
 }

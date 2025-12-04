@@ -10,10 +10,6 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 public class Measurement extends AuditableAbstractAggregateRoot<Measurement> {
-
-    @Embedded
-    private ResidentId residentId;
-
     @Embedded
     private DeviceId deviceId;
 
@@ -44,15 +40,13 @@ public class Measurement extends AuditableAbstractAggregateRoot<Measurement> {
     }
 
     public Measurement(
-            ResidentId residentId,
-            DeviceId deviceId,
+        DeviceId deviceId,
             HeartRate heartRate,
             BloodPressure bloodPressure,
             Temperature temperature,
             OxygenSaturation oxygenSaturation,
             RespiratoryRate respiratoryRate) {
 
-        this.residentId = residentId;
         this.deviceId = deviceId;
         this.timestamp = LocalDateTime.now();
         this.heartRate = heartRate;
@@ -63,8 +57,7 @@ public class Measurement extends AuditableAbstractAggregateRoot<Measurement> {
     }
 
     public Measurement(
-            ResidentId residentId,
-            DeviceId deviceId,
+           DeviceId deviceId,
             LocalDateTime timestamp,
             HeartRate heartRate,
             BloodPressure bloodPressure,
@@ -72,7 +65,6 @@ public class Measurement extends AuditableAbstractAggregateRoot<Measurement> {
             OxygenSaturation oxygenSaturation,
             RespiratoryRate respiratoryRate) {
 
-        this.residentId = residentId;
         this.deviceId = deviceId;
         this.timestamp = timestamp;
         this.heartRate = heartRate;
