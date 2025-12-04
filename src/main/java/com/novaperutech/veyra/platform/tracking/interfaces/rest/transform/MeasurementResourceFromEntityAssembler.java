@@ -7,7 +7,6 @@ public class MeasurementResourceFromEntityAssembler {
     public static MeasurementResource toResourceFromEntity(Measurement measurement){
         return new MeasurementResource(
                 measurement.getId(),
-                measurement.getResidentId().residentId(),
                 measurement.getDeviceId().deviceId()
         );
     }
