@@ -22,7 +22,7 @@ import java.util.List;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RestController
-@RequestMapping(value = "/api/v1/{residentId}/allergies",produces = APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/api/v1/residents/{residentId}/allergies",produces = APPLICATION_JSON_VALUE)
 @Tag(name="Residents")
 public class ResidentAllergiesController {
 private final AllergyCommandService allergyCommandService;
