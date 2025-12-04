@@ -1,6 +1,8 @@
 package com.novaperutech.veyra.platform.tracking.application.internal.eventhandlers;
 
+import com.novaperutech.veyra.platform.tracking.domain.model.commands.SeedDeviceCommand;
 import com.novaperutech.veyra.platform.tracking.domain.model.commands.SeedMeasurementCommand;
+import com.novaperutech.veyra.platform.tracking.domain.services.DeviceCommandService;
 import com.novaperutech.veyra.platform.tracking.domain.services.MeasurementCommandService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,35 +12,35 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 
-/**
- * ApplicationReadyEventHandler class
- * This class is used to handle the ApplicationReadyEvent for seeding measurements
- */
 @Service
 public class TrackingApplicationReadyEventHandler {
-    private final MeasurementCommandService measurementCommandService;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(TrackingApplicationReadyEventHandler.class);
 
-    /**
-     * Constructor for ApplicationReadyEventHandler.
-     * @param measurementCommandService the measurement command service
-     */
-    public TrackingApplicationReadyEventHandler(MeasurementCommandService measurementCommandService) {
+    private final DeviceCommandService deviceCommandService;
+    private final MeasurementCommandService measurementCommandService;
+
+    public TrackingApplicationReadyEventHandler(
+            DeviceCommandService deviceCommandService,
+            MeasurementCommandService measurementCommandService) {
+        this.deviceCommandService = deviceCommandService;
         this.measurementCommandService = measurementCommandService;
     }
 
-    /**
-     * Handle the ApplicationReadyEvent
-     * This method is used to seed the measurements
-     * @param event the ApplicationReadyEvent to handle
-     */
     @EventListener
     public void on(ApplicationReadyEvent event) {
         var applicationName = event.getApplicationContext().getId();
-        LOGGER.info("Starting to verify if measurements seeding is needed for {} at {}", applicationName, currentTimestamp());
+        LOGGER.info("Starting seeding process for {} at {}", applicationName, currentTimestamp());
+
+        LOGGER.info("Step 1: Seeding devices...");
+        var seedDeviceCommand = new SeedDeviceCommand();
+        deviceCommandService.handle(seedDeviceCommand);
+
+        LOGGER.info("Step 2: Seeding measurements...");
         var seedMeasurementCommand = new SeedMeasurementCommand();
         measurementCommandService.handle(seedMeasurementCommand);
-        LOGGER.info("Measurements seeding verification finished for {} at {}", applicationName, currentTimestamp());
+
+        LOGGER.info("Seeding process finished for {} at {}", applicationName, currentTimestamp());
     }
 
     private Timestamp currentTimestamp() {
