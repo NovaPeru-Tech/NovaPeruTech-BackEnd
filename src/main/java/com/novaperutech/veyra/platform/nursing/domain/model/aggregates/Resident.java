@@ -12,7 +12,7 @@ import java.time.LocalDate;
 @Getter
 public class Resident extends AuditableAbstractAggregateRoot<Resident> {
     protected Resident() {
-        super();
+        super(); this.relative=null;
     }
 
     @Embedded
@@ -46,6 +46,9 @@ public class Resident extends AuditableAbstractAggregateRoot<Resident> {
     @ManyToOne
     @JoinColumn(name = "room_id")
     private Room room;
+    @ManyToOne
+    @JoinColumn(name = "relative_id")
+    private Relative relative;
 
     public Resident(Long personProfileId, String legalRepresentativeFirstName, String legalRepresentativeLastName, String legalRepresentativePhoneNumber
             , String emergencyContactFirstName, String emergencyContactLastName, String emergencyContactPhoneNumber) {
@@ -63,6 +66,7 @@ public class Resident extends AuditableAbstractAggregateRoot<Resident> {
         this.nursingHome = nursingHome;
         this.residentStatus = ResidentState.ACTIVE;
        this.addDomainEvent(new AdmittedResidentEvent(this,this.getId(),nursingHome.getId(), LocalDate.now(),residentStatus.name()));
+
     }
     /**
      * Assign this resident to a room.
@@ -208,4 +212,7 @@ public class Resident extends AuditableAbstractAggregateRoot<Resident> {
     public void assignedStaffToResidentCommand(Long staffMemberId){
         this.staffMemberId=new StaffMemberId(staffMemberId);
     }
+public void assignedRelativeToResidentCommand(Relative relative){
+
+}
 }
