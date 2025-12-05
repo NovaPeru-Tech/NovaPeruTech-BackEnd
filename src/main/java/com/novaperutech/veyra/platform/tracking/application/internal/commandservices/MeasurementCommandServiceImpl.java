@@ -12,27 +12,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-/**
- * Implementation of {@link MeasurementCommandService} to handle {@link SeedMeasurementCommand}
- */
 @Service
 public class MeasurementCommandServiceImpl implements MeasurementCommandService {
 
     private final MeasurementRepository measurementRepository;
 
-    /**
-     * Constructor for MeasurementCommandServiceImpl.
-     * @param measurementRepository the measurement repository
-     */
     public MeasurementCommandServiceImpl(MeasurementRepository measurementRepository) {
         this.measurementRepository = measurementRepository;
     }
 
-    /**
-     * This method will handle the {@link SeedMeasurementCommand} and will create measurements if not exists
-     * @param command {@link SeedMeasurementCommand}
-     * @see SeedMeasurementCommand
-     */
     @Override
     public void handle(SeedMeasurementCommand command) {
         if (measurementRepository.count() > 0) {

@@ -14,12 +14,10 @@
                 this.endTime = endTime;
             }
 
-            // Getter esperado por tu código
             public LocalTime getStartTime() {
                 return startTime;
             }
 
-            // Getter esperado por tu código
             public LocalTime getEndTime() {
                 return endTime;
             }
@@ -27,8 +25,7 @@
             @Override
             public boolean equals(Object o) {
                 if (this == o) return true;
-                if (!(o instanceof ActivityPeriod)) return false;
-                ActivityPeriod that = (ActivityPeriod) o;
+                if (!(o instanceof ActivityPeriod that)) return false;
                 return Objects.equals(startTime, that.startTime) &&
                        Objects.equals(endTime, that.endTime);
             }
