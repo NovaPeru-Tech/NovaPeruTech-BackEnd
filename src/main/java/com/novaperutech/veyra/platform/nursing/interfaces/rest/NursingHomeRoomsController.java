@@ -1,17 +1,21 @@
 package com.novaperutech.veyra.platform.nursing.interfaces.rest;
 
 import com.novaperutech.veyra.platform.nursing.domain.model.queries.GetLastAddedRoomByNursingHomeIdQuery;
+import com.novaperutech.veyra.platform.nursing.domain.model.queries.GetResidentByIdQuery;
 import com.novaperutech.veyra.platform.nursing.domain.model.queries.GetRoomsByStatusAndNursingHomeIdQuery;
 import com.novaperutech.veyra.platform.nursing.domain.model.queries.GetRoomsForNursingHomeIdQuery;
 import com.novaperutech.veyra.platform.nursing.domain.model.valueobjects.RoomStatus;
 import com.novaperutech.veyra.platform.nursing.domain.services.NursingHomeCommandServices;
 import com.novaperutech.veyra.platform.nursing.domain.services.NursingHomeQueryServices;
 import com.novaperutech.veyra.platform.nursing.domain.services.ResidentCommandServices;
+import com.novaperutech.veyra.platform.nursing.domain.services.ResidentQueryServices;
 import com.novaperutech.veyra.platform.nursing.interfaces.rest.resources.AssignedRoomForResidentResource;
 import com.novaperutech.veyra.platform.nursing.interfaces.rest.resources.CreateRoomResource;
+import com.novaperutech.veyra.platform.nursing.interfaces.rest.resources.ResidentResource;
 import com.novaperutech.veyra.platform.nursing.interfaces.rest.resources.RoomResource;
 import com.novaperutech.veyra.platform.nursing.interfaces.rest.transform.AssignedRoomForResidentCommandFromResourceAssembler;
 import com.novaperutech.veyra.platform.nursing.interfaces.rest.transform.CreateRoomCommandFromResourceAssembler;
+import com.novaperutech.veyra.platform.nursing.interfaces.rest.transform.ResidentResourceFromEntityAssembler;
 import com.novaperutech.veyra.platform.nursing.interfaces.rest.transform.RoomResourceFromEntityAssembler;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -32,12 +36,14 @@ public class NursingHomeRoomsController {
 private final ResidentCommandServices residentCommandServices;
     private final NursingHomeCommandServices nursingHomeCommandServices;
     private final NursingHomeQueryServices nursingHomeQueryServices;
+    private final ResidentQueryServices residentQueryServices;
 
     public NursingHomeRoomsController(ResidentCommandServices residentCommandServices, NursingHomeCommandServices nursingHomeCommandServices,
-                                      NursingHomeQueryServices nursingHomeQueryServices) {
+                                      NursingHomeQueryServices nursingHomeQueryServices, ResidentQueryServices residentQueryServices) {
         this.residentCommandServices = residentCommandServices;
         this.nursingHomeCommandServices = nursingHomeCommandServices;
         this.nursingHomeQueryServices = nursingHomeQueryServices;
+        this.residentQueryServices = residentQueryServices;
     }
     @PostMapping
     @Operation(summary = "Add a room to nursing home", description = "Create a new room for the specified nursing home")
@@ -83,7 +89,7 @@ private final ResidentCommandServices residentCommandServices;
             @ApiResponse(responseCode = "200", description = "Resident assigned to room successfully"),
             @ApiResponse(responseCode = "400", description = "Bad request")
     })
-    public ResponseEntity<Void> assignResidentToRoom(
+    public ResponseEntity<ResidentResource> assignResidentToRoom(
             @PathVariable Long nursingHomeId,
             @PathVariable Long residentId,
             @Valid @RequestBody AssignedRoomForResidentResource resource) {
@@ -92,8 +98,11 @@ private final ResidentCommandServices residentCommandServices;
                 .toCommandFromResource(nursingHomeId, residentId, resource);
 
         residentCommandServices.handle(command);
-
-        return ResponseEntity.ok().build();
+       var getResidentByIdQuery=residentQueryServices.handle(new GetResidentByIdQuery(residentId));
+       if (getResidentByIdQuery.isEmpty()){return ResponseEntity.notFound().build();}
+       var residentEntity= getResidentByIdQuery.get();
+       var residentResource= ResidentResourceFromEntityAssembler.toResourceFromEntity(residentEntity);
+        return ResponseEntity.ok(residentResource);
     }
 @GetMapping("/{roomStatus}")
 @Operation(summary = "Get rooms by nursing home id and status",description = "Get rooms for a specific nursing home filtered by their status")
