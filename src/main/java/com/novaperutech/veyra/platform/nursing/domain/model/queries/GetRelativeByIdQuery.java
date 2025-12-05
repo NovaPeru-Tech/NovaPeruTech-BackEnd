@@ -1,4 +1,4 @@
 package com.novaperutech.veyra.platform.nursing.domain.model.queries;
 
-public record GetFamiliarByIdQuery(Long id) {
+public record GetRelativeByIdQuery(Long id) {
 }
