@@ -1,4 +1,5 @@
 package com.novaperutech.veyra.platform.nursing.interfaces.rest;
+import com.novaperutech.veyra.platform.nursing.domain.model.queries.GetNursingHomeByAdministratorIdQuery;
 import com.novaperutech.veyra.platform.nursing.domain.model.queries.GetNursingHomeByIdQuery;
 import com.novaperutech.veyra.platform.nursing.domain.services.NursingHomeCommandServices;
 import com.novaperutech.veyra.platform.nursing.domain.services.NursingHomeQueryServices;
@@ -7,6 +8,7 @@ import com.novaperutech.veyra.platform.nursing.interfaces.rest.resources.Nursing
 import com.novaperutech.veyra.platform.nursing.interfaces.rest.transform.CreateNursingHomeCommandFromResourceAssembler;
 import com.novaperutech.veyra.platform.nursing.interfaces.rest.transform.NursingHomeFromEntityAssembler;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -42,5 +44,25 @@ public class AdministratorNursingHomesController {
         var nursingHomeEntity= nursingHome.get();
         var nursingHomeResource= NursingHomeFromEntityAssembler.toResourceFromEntity(nursingHomeEntity);
         return new ResponseEntity<>(nursingHomeResource, HttpStatus.CREATED);
+    }
+    @GetMapping
+    @Operation(
+            summary = "Get nursing home by administrator id",
+            description = "Returns the nursing home resource associated with the given administrator id. " +
+                    "If no nursing home is found, the endpoint responds with 404 Not Found."
+    )
+    @ApiResponses({
+            @ApiResponse( responseCode = "200",  description = "Nursing home found" ),
+            @ApiResponse(responseCode = "400", description = "Bad request — invalid administratorId"),
+            @ApiResponse(responseCode = "404", description = "Nursing home not found")
+    })
+    @Parameter(name = "administratorId", description = "Identifier of the administrator who manages the nursing home",required = true)
+    public ResponseEntity<NursingHomeResource>getNursingHomeByAdministratorId(@PathVariable  Long administratorId)
+    {
+        var nursingHome= nursingHomeQueryServices.handle(new GetNursingHomeByAdministratorIdQuery(administratorId));
+        if (nursingHome.isEmpty()){return ResponseEntity.notFound().build();}
+           var nursingHomeEntity=nursingHome.get();
+        var nursingHomeResource=NursingHomeFromEntityAssembler.toResourceFromEntity(nursingHomeEntity);
+        return ResponseEntity.ok(nursingHomeResource);
     }
 }
