@@ -8,9 +8,9 @@ import lombok.Getter;
 
 @Getter
 @Entity
-public class Familiar extends AuditableAbstractAggregateRoot<Familiar> {
+public class Relative extends AuditableAbstractAggregateRoot<Relative> {
     @Embedded
     private UserId userId;
-    public Familiar(UserId userId){this.userId=userId;}
-    public Familiar(){}
+    public Relative(UserId userId){this.userId=userId;}
+    public Relative(){}
 }

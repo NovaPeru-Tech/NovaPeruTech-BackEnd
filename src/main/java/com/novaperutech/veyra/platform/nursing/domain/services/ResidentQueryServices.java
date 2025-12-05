@@ -12,5 +12,5 @@ public interface ResidentQueryServices {
     Optional<Resident>handle(GetResidentByPersonProfileQuery query);
     List<Resident>handle(GetActiveResidentsByNursingHomeId query);
     boolean handle(ExistsByResidentIdQuery query);
-
+   List<Resident>handle(GetResidentsByRelativeIdQuery query);
 }
