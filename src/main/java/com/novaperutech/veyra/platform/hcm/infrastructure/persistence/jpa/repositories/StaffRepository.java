@@ -14,4 +14,7 @@ public interface StaffRepository extends JpaRepository<Staff, Long> {
     Optional<Staff> findByPersonProfileIdAndNursingHomeId(PersonProfileId personProfileId, NursingHomeId nursingHomeId);
 
     List<Staff> findByNursingHomeId(NursingHomeId nursingHomeId);
+
+    boolean existsByNursingHomeId(NursingHomeId nursingHomeId);
+
 }
