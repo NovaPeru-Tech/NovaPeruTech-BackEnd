@@ -1,5 +1,7 @@
 package com.novaperutech.veyra.platform.iam.interfaces.rest.resources;
 
+import java.util.List;
+
 /**
  * Resource representing an authenticated user.
  *
@@ -7,6 +9,6 @@ package com.novaperutech.veyra.platform.iam.interfaces.rest.resources;
  * @param username the username of the user
  * @param token    the authentication token
  */
-public record AuthenticatedUserResource(Long id, String username, String token) {
+public record AuthenticatedUserResource(Long id, String username, List<String> roles, String token) {
 
 }
