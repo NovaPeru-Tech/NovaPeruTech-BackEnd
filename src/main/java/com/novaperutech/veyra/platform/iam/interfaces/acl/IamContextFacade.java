@@ -42,4 +42,9 @@ public interface IamContextFacade {
      * @return the username if found, or null if the user does not exist
      */
     String fetchUsernameByUserId(Long userId);
+    /**
+     * Checks if a user exists by ID.
+     * ADDED FOR PAYMENTS: To validate user before creating subscription.
+     */
+    boolean existsUserById(Long userId);
 }
