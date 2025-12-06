@@ -6,7 +6,7 @@ import com.novaperutech.veyra.platform.nursing.interfaces.rest.resources.UpdateR
 public class UpdateResidentCommandFromResourceAssembler {
     public static UpdateResidentCommand toCommandFromResource(Long residentId,UpdateResidentResource resource){
         return new UpdateResidentCommand(residentId,resource.dni(),resource.firstName(),
-        resource.lastName(),resource.birthDate(),resource.Age(),resource.emailAddress(),
+        resource.lastName(),resource.birthDate(),resource.age(),resource.emailAddress(),
         resource.street(),resource.number(),resource.city(),resource.postalCode(),resource.country(),resource.photo(),resource.phoneNumber()
         ,resource.legalRepresentativeFirstName(),resource.legalRepresentativeLastName()
         ,resource.legalRepresentativePhoneNumber()

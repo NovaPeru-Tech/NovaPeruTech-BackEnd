@@ -10,5 +10,5 @@ public record PersonProfileResource(Long id,
                                     String photo,
                                     String phoneNumber,
                                     String emailAddress,
-                                    String StreetAddress) {
+                                    String streetAddress) {
 }

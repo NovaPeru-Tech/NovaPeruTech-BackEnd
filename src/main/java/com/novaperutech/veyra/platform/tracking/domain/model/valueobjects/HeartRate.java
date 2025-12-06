@@ -1,0 +1,13 @@
+package com.novaperutech.veyra.platform.tracking.domain.model.valueobjects;
+
+import jakarta.persistence.Embeddable;
+
+@Embeddable
+public record HeartRate(Integer value) {
+
+    public HeartRate {
+        if (value == null || value < 0 || value > 300) {
+            throw new IllegalArgumentException("Heart rate must be between 0 and 300 bpm");
+        }
+    }
+}

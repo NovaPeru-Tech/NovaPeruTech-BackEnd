@@ -1,0 +1,13 @@
+package com.novaperutech.veyra.platform.tracking.domain.model.valueobjects;
+
+import jakarta.persistence.Embeddable;
+
+@Embeddable
+public record Temperature(Double value) {
+
+    public Temperature {
+        if (value == null || value < 30.0 || value > 45.0) {
+            throw new IllegalArgumentException("Temperature must be between 30.0 and 45.0 °C");
+        }
+    }
+}

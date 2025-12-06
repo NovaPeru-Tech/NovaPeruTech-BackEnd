@@ -1,7 +1,7 @@
 package com.novaperutech.veyra.platform.hcm.domain.model.entities;
 
 import com.novaperutech.veyra.platform.hcm.domain.model.aggregates.Staff;
-import com.novaperutech.veyra.platform.hcm.domain.model.valueobjetcs.*;
+import com.novaperutech.veyra.platform.hcm.domain.model.valueobjects.*;
 import com.novaperutech.veyra.platform.shared.domain.model.entities.AuditableModel;
 import jakarta.persistence.*;
 import lombok.Getter;

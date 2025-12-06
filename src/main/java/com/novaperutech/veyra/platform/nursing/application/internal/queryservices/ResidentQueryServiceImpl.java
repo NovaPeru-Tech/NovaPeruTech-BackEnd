@@ -44,5 +44,10 @@ public class ResidentQueryServiceImpl implements ResidentQueryServices {
 
     }
 
+    @Override
+    public List<Resident> handle(GetResidentsByRelativeIdQuery query) {
+        return residentRepository.findByRelativeId(query.relativeId());
+    }
+
 
 }

@@ -14,19 +14,24 @@ import com.novaperutech.veyra.platform.nursing.domain.model.valueobjects.Rooms;
 import com.novaperutech.veyra.platform.shared.domain.model.aggregates.AuditableAbstractAggregateRoot;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 
 @Entity
 @Getter
 public class NursingHome extends AuditableAbstractAggregateRoot<NursingHome> {
-
+    @JoinColumn(name = "administrator_Id")
+    @ManyToOne
+    private Administrator administrator;
     @Embedded
     private BusinessProfileId businessProfileId;
 
     public NursingHome() {}
 
-    public NursingHome(BusinessProfileId businessProfileId) {
+    public NursingHome(BusinessProfileId businessProfileId, Administrator administrator) {
         this.businessProfileId = businessProfileId;
+        this.administrator=administrator;
     }
     @Embedded
     private Rooms rooms;
@@ -35,25 +40,7 @@ public class NursingHome extends AuditableAbstractAggregateRoot<NursingHome> {
      * @param capacity the capacity of the room
      * @param type the type of the room
      */
-    public void addRoom(Integer capacity, String type) {
-        this.rooms.addRoom(this, capacity, type);
-    }
-    /**
-     * Assign a resident to a room.
-     * @param roomNumber the room number
-     * @param resident the resident to assign
-     */
-    public void assignResidentToRoom(String roomNumber, Resident resident) {
-        var room = this.rooms.getRoomByRoomNumber(roomNumber);
-        room.assignResident(resident);
-    }
-    /**
-     * Change resident in a room.
-     * @param roomNumber the room number
-     * @param newResident the new resident
-     */
-    public void changeResidentInRoom(String roomNumber, Resident newResident) {
-        var room = this.rooms.getRoomByRoomNumber(roomNumber);
-        room.changeResident(newResident);
+    public void addRoom(Integer capacity, String type,String roomNumber) {
+        this.rooms.addRoom(this, capacity, type,roomNumber);
     }
 }

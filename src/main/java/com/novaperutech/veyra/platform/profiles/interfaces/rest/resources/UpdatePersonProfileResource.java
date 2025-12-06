@@ -2,7 +2,7 @@ package com.novaperutech.veyra.platform.profiles.interfaces.rest.resources;
 
 import java.time.LocalDate;
 
-public record UpdatePersonProfileResource(String dni, String firstName, String lastName, LocalDate birthDate, Integer Age, String emailAddress, String street,
+public record UpdatePersonProfileResource(String dni, String firstName, String lastName, LocalDate birthDate, Integer age, String emailAddress, String street,
                                           String number,
                                           String city,
                                           String postalCode,

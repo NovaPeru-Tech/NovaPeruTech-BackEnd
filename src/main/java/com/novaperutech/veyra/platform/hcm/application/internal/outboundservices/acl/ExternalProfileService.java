@@ -1,6 +1,6 @@
 package com.novaperutech.veyra.platform.hcm.application.internal.outboundservices.acl;
 
-import com.novaperutech.veyra.platform.hcm.domain.model.valueobjetcs.PersonProfileId;
+import com.novaperutech.veyra.platform.hcm.domain.model.valueobjects.PersonProfileId;
 import com.novaperutech.veyra.platform.profiles.interfaces.acl.ProfilesContextFacade;
 import org.springframework.stereotype.Service;
 

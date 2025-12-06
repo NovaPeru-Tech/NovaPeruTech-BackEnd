@@ -1,56 +1,25 @@
 package com.novaperutech.veyra.platform.nursing.interfaces.rest;
-
 import com.novaperutech.veyra.platform.nursing.domain.model.queries.GetAllNursingHomeQuery;
 import com.novaperutech.veyra.platform.nursing.domain.model.queries.GetNursingHomeByIdQuery;
-import com.novaperutech.veyra.platform.nursing.domain.services.NursingHomeCommandServices;
 import com.novaperutech.veyra.platform.nursing.domain.services.NursingHomeQueryServices;
-import com.novaperutech.veyra.platform.nursing.interfaces.rest.resources.CreateNursingHomeResource;
 import com.novaperutech.veyra.platform.nursing.interfaces.rest.resources.NursingHomeResource;
-import com.novaperutech.veyra.platform.nursing.interfaces.rest.transform.CreateNursingHomeCommandFromResourceAssembler;
 import com.novaperutech.veyra.platform.nursing.interfaces.rest.transform.NursingHomeFromEntityAssembler;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
-
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-
 @RestController
 @RequestMapping(value = "/api/v1/nursing-homes",produces = APPLICATION_JSON_VALUE)
 @Tag(name = "Nursing Homes",description = "Available nursing home Endpoints")
 public class NursingHomesController {
-    private final NursingHomeCommandServices nursingHomeCommandServices;
     private final NursingHomeQueryServices nursingHomeQueryServices;
-
-    public NursingHomesController(NursingHomeCommandServices nursingHomeCommandServices, NursingHomeQueryServices nursingHomeQueryServices) {
-        this.nursingHomeCommandServices = nursingHomeCommandServices;
+    public NursingHomesController( NursingHomeQueryServices nursingHomeQueryServices) {
         this.nursingHomeQueryServices = nursingHomeQueryServices;
-    }
-
-    @PostMapping
-    @Operation(
-            summary = "Create a new nursing home",
-            description = "Creates a new nursing home with the provided business profile information and returns the created nursing home resource"
-    )    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Nursing home create"),
-            @ApiResponse(responseCode = "400",description = "Bad request")
-    })
-    public ResponseEntity<NursingHomeResource>createNursingHome(@RequestBody CreateNursingHomeResource resource){
-        var createNursingHomeCommand= CreateNursingHomeCommandFromResourceAssembler.toCommandFromResource(resource);
-        var nursingHomeId=nursingHomeCommandServices.handle(createNursingHomeCommand);
-        if (nursingHomeId==null||nursingHomeId==0L){return ResponseEntity.badRequest().build();}
-        var getNursingHomeByIdQuery= new GetNursingHomeByIdQuery(nursingHomeId);
-       var nursingHome= nursingHomeQueryServices.handle(getNursingHomeByIdQuery);
-       if (nursingHome.isEmpty()){return ResponseEntity.notFound().build();}
-       var nursingHomeEntity= nursingHome.get();
-       var nursingHomeResource= NursingHomeFromEntityAssembler.toResourceFromEntity(nursingHomeEntity);
-       return new ResponseEntity<>(nursingHomeResource, HttpStatus.CREATED);
     }
     @GetMapping("/{nursingHomeId}")
     @Operation(
@@ -90,6 +59,4 @@ public class NursingHomesController {
          var nursingHomeResource=nursingHome.stream().map(NursingHomeFromEntityAssembler::toResourceFromEntity).toList();
          return ResponseEntity.ok(nursingHomeResource);
      }
-
-
 }
