@@ -1,4 +1,17 @@
 package com.novaperutech.veyra.platform.payments.interfaces.rest.resources;
 
-public record SubscriptionResource() {
-}
+import java.time.LocalDateTime;
+
+public record SubscriptionResource(
+        Long id,
+        Long userId,
+        String stripeSubscriptionId,
+        String planType,
+        String period,
+        Double amount,
+        String currency,
+        String status,
+        LocalDateTime currentPeriodStart,
+        LocalDateTime currentPeriodEnd,
+        LocalDateTime createdAt
+) {}
