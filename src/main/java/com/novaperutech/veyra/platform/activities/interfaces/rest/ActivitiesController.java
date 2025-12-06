@@ -11,7 +11,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.time.LocalDate;
 import java.util.List;
 
@@ -30,10 +29,7 @@ public class ActivitiesController {
         this.activityQueryService = activityQueryService;
     }
 
-    /**
-     * Obtiene todas las actividades para un día específico.
-     * Esto alimenta tu vista principal de "Activities to do".
-     */
+
     @GetMapping
     public ResponseEntity<List<ActivityResource>> getActivitiesForDay(
             @PathVariable Long nursingHomeId,
@@ -43,7 +39,7 @@ public class ActivitiesController {
         var activityViews = activityQueryService.handle(query);
 
         if (activityViews.isEmpty()) {
-            return ResponseEntity.ok(List.of()); // Devuelve 200 OK con lista vacía
+            return ResponseEntity.ok(List.of());
         }
 
         var activityResources = activityViews.stream()
@@ -52,9 +48,6 @@ public class ActivitiesController {
         return ResponseEntity.ok(activityResources);
     }
 
-    /**
-     * Crea una nueva actividad.
-     */
     @PostMapping
     public ResponseEntity<Long> createActivity(
             @PathVariable Long nursingHomeId,
