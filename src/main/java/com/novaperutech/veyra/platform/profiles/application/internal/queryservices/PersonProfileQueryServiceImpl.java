@@ -4,7 +4,7 @@ import com.novaperutech.veyra.platform.profiles.domain.model.aggregates.PersonPr
 import com.novaperutech.veyra.platform.profiles.domain.model.queries.GetAllPersonProfileQuery;
 import com.novaperutech.veyra.platform.profiles.domain.model.queries.GetPersonProfileByDniQuery;
 import com.novaperutech.veyra.platform.profiles.domain.model.queries.GetPersonProfileByIdQuery;
-import com.novaperutech.veyra.platform.profiles.domain.model.valueobjects.Dni;
+import com.novaperutech.veyra.platform.profiles.domain.model.queries.GetProfileByDniQuery;
 import com.novaperutech.veyra.platform.profiles.domain.services.PersonProfileQueryService;
 import com.novaperutech.veyra.platform.profiles.infrastructure.persistence.jpa.repositories.PersonProfileRepository;
 import org.springframework.stereotype.Service;
@@ -32,6 +32,11 @@ public class PersonProfileQueryServiceImpl implements PersonProfileQueryService 
 
     @Override
     public Optional<PersonProfile> handle(GetPersonProfileByDniQuery query) {
+        return personProfileRepository.findByDni(query.dni());
+    }
+
+    @Override
+    public Optional<PersonProfile> handle(GetProfileByDniQuery query) {
         return personProfileRepository.findByDni(query.dni());
     }
 }

@@ -2,7 +2,9 @@ package com.novaperutech.veyra.platform.profiles.interfaces;
 
 import com.novaperutech.veyra.platform.profiles.domain.model.commands.DeletePersonProfileCommand;
 import com.novaperutech.veyra.platform.profiles.domain.model.queries.GetAllPersonProfileQuery;
+import com.novaperutech.veyra.platform.profiles.domain.model.queries.GetPersonProfileByDniQuery;
 import com.novaperutech.veyra.platform.profiles.domain.model.queries.GetPersonProfileByIdQuery;
+import com.novaperutech.veyra.platform.profiles.domain.model.valueobjects.Dni;
 import com.novaperutech.veyra.platform.profiles.domain.services.PersonProfileCommandService;
 import com.novaperutech.veyra.platform.profiles.domain.services.PersonProfileQueryService;
 import com.novaperutech.veyra.platform.profiles.interfaces.rest.resources.CreatePersonProfileResource;
@@ -59,7 +61,7 @@ public class PersonProfilesController {
             @ApiResponse(responseCode = "200", description = "Person profile found "),
             @ApiResponse(responseCode = "404", description = "Person profile not found ")
     })
-    @Parameter(name = "personProfileId",description = " The unique identifier of the person profile",required = true)
+    @Parameter(name = "personProfileId", description = " The unique identifier of the person profile", required = true)
     public ResponseEntity<PersonProfileResource> getPersonProfileById(@PathVariable Long personProfileId) {
         var getPersonProfileQuery = personProfileQueryService.handle(new GetPersonProfileByIdQuery(personProfileId));
         if (getPersonProfileQuery.isEmpty()) {
@@ -69,26 +71,44 @@ public class PersonProfilesController {
         var personProfileResource = PersonProfileResourceFromEntityAssembler.toResourceFromEntity(personProfileEntity);
         return ResponseEntity.ok(personProfileResource);
     }
+
     @GetMapping()
-    @Operation(summary = "Get all person profiles",description = "delete person profile ")
+    @Operation(summary = "Get all person profiles or filter by DNI")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Person profiles found "),
-            @ApiResponse(responseCode = "400",description = " Person profiles not found ")})
-    public ResponseEntity<List<PersonProfileResource>>getAllPersonProfiles() {
-        var getAllPersonProfileQuery=personProfileQueryService.handle(new GetAllPersonProfileQuery());
-        if (getAllPersonProfileQuery.isEmpty()){return ResponseEntity.notFound().build();}
-        var personProfileResource= getAllPersonProfileQuery.stream().map(PersonProfileResourceFromEntityAssembler::toResourceFromEntity).toList();
+            @ApiResponse(responseCode = "200", description = "Person profiles found"),
+            @ApiResponse(responseCode = "404", description = "Person profile not found")
+    })
+    public ResponseEntity<List<PersonProfileResource>> getAllPersonProfiles(
+            @RequestParam(required = false) @Parameter(description = "Filter by DNI") String dni) {
+
+        if (dni != null && !dni.isEmpty()) {
+            var dniValue = new Dni(dni);
+            var queryResult = personProfileQueryService.handle(new GetPersonProfileByDniQuery(dniValue));
+            if (queryResult.isEmpty()) {
+                return ResponseEntity.notFound().build();
+            }
+            var personProfileEntity = queryResult.get();
+            var resource = PersonProfileResourceFromEntityAssembler.toResourceFromEntity(personProfileEntity);
+            return ResponseEntity.ok(List.of(resource));
+        }
+        var getAllPersonProfileQuery = personProfileQueryService.handle(new GetAllPersonProfileQuery());
+        if (getAllPersonProfileQuery.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        var personProfileResource = getAllPersonProfileQuery.stream()
+                .map(PersonProfileResourceFromEntityAssembler::toResourceFromEntity)
+                .toList();
         return ResponseEntity.ok(personProfileResource);
     }
     @DeleteMapping("/{personProfileId}")
     @Operation(summary = "Person profile delete by id ")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Person profile delete "),
-            @ApiResponse(responseCode = "404",description = "Person profile not found ")
+            @ApiResponse(responseCode = "404", description = "Person profile not found ")
     })
-    @Parameter(name = "personProfileId",description = "The unique identifier of the person profile", required = true)
-    public ResponseEntity<?>deletePersonProfileById(@PathVariable Long personProfileId) {
-        var deletePersonProfileCommand= new DeletePersonProfileCommand(personProfileId);
+    @Parameter(name = "personProfileId", description = "The unique identifier of the person profile", required = true)
+    public ResponseEntity<?> deletePersonProfileById(@PathVariable Long personProfileId) {
+        var deletePersonProfileCommand = new DeletePersonProfileCommand(personProfileId);
         personProfileCommandService.handle(deletePersonProfileCommand);
         return ResponseEntity.ok("Person profile with give id successfully deleted");
     }
@@ -97,16 +117,17 @@ public class PersonProfilesController {
     @Operation(summary = "Person profile updated by id ")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Person profile updated "),
-            @ApiResponse(responseCode = "404",description = "Person profile not found ")
+            @ApiResponse(responseCode = "404", description = "Person profile not found ")
     })
-    @Parameter(name = "personProfileId",description = "The unique identifier of the person profile", required = true)
-    public ResponseEntity<PersonProfileResource>updatedPersonProfile(@PathVariable Long personProfileId,@RequestBody UpdatePersonProfileResource resource)
-    {
-        var updatedPersonProfileCommand= UpdatePersonProfileCommandFromResourceAssembler.toCommandFromResource(personProfileId,resource);
-        var updatedPersonProfile= personProfileCommandService.handle(updatedPersonProfileCommand);
-        if (updatedPersonProfile.isEmpty()) {return ResponseEntity.notFound().build();}
-        var updatedPersonProfileEntity= updatedPersonProfile.get();
-        var updatePersonProfileResource= PersonProfileResourceFromEntityAssembler.toResourceFromEntity(updatedPersonProfileEntity);
+    @Parameter(name = "personProfileId", description = "The unique identifier of the person profile", required = true)
+    public ResponseEntity<PersonProfileResource> updatedPersonProfile(@PathVariable Long personProfileId, @RequestBody UpdatePersonProfileResource resource) {
+        var updatedPersonProfileCommand = UpdatePersonProfileCommandFromResourceAssembler.toCommandFromResource(personProfileId, resource);
+        var updatedPersonProfile = personProfileCommandService.handle(updatedPersonProfileCommand);
+        if (updatedPersonProfile.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        var updatedPersonProfileEntity = updatedPersonProfile.get();
+        var updatePersonProfileResource = PersonProfileResourceFromEntityAssembler.toResourceFromEntity(updatedPersonProfileEntity);
         return ResponseEntity.ok(updatePersonProfileResource);
     }
 }
