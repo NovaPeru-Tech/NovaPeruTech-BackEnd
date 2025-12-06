@@ -92,7 +92,6 @@ public class WebSecurityConfiguration {
      */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        // CORRECCIÓN AQUÍ: Se cambió '_' por 'request' para compatibilidad con Java 21
         http.cors(configurer -> configurer.configurationSource(request -> {
             var cors = new CorsConfiguration();
             cors.setAllowedOrigins(List.of("*"));
