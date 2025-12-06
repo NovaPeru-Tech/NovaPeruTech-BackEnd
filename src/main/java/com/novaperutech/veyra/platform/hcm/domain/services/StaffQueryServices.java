@@ -14,4 +14,5 @@ public interface StaffQueryServices {
     List<Contract>handle(GetAllContractsByStaffMemberIdQuery query);
     Optional<Contract>handle(GetContractByStaffMemberIdAndContractIdQuery query);
     Optional<Contract>handle(GetLastAddedContractByStaffMemberIdQuery query);
+    boolean handle(ExistStaffByNursingHomeIdQuery query);
 }

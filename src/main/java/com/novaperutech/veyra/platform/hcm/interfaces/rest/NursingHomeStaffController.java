@@ -1,5 +1,4 @@
 package com.novaperutech.veyra.platform.hcm.interfaces.rest;
-
 import com.novaperutech.veyra.platform.hcm.domain.model.queries.GetAllStaffMemberByNursingHomeIdQuery;
 import com.novaperutech.veyra.platform.hcm.domain.model.queries.GetStaffByIdQuery;
 import com.novaperutech.veyra.platform.hcm.domain.model.valueobjects.NursingHomeId;
@@ -49,16 +48,23 @@ public class NursingHomeStaffController {
         return new ResponseEntity<>(staffResource, HttpStatus.CREATED);
 
     }
-    @GetMapping()
-    @Operation(summary = "Get all staff",description = "Get all staff ")
+    @GetMapping
+    @Operation(summary = "Get all staff members for a nursing home",
+            description = "Get all staff members associated with the specified nursing home")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200",description = " staff found"),
-            @ApiResponse(responseCode = "404",description = "staff not found")
+            @ApiResponse(responseCode = "200", description = "Staff members retrieved successfully"),
+            @ApiResponse(responseCode = "404", description = "Nursing home not found or no staff members exist")
     })
-    public ResponseEntity<List<StaffResource>> getAllStaff(@PathVariable Long nursingHomeId){
-        var staff= staffQueryServices.handle(new GetAllStaffMemberByNursingHomeIdQuery(new NursingHomeId( nursingHomeId)));
-        if (staff.isEmpty()){return ResponseEntity.notFound().build();}
-        var staffResource=staff.stream().map(StaffResourceFromEntityAssembler::toResourceFromEntity).toList();
-        return ResponseEntity.ok(staffResource);
+    public ResponseEntity<List<StaffResource>> getAllStaff(@PathVariable Long nursingHomeId) {
+        var staff = staffQueryServices.handle(
+                new GetAllStaffMemberByNursingHomeIdQuery(new NursingHomeId(nursingHomeId)));
+
+        return ResponseEntity.ok(
+                staff.stream()
+                        .map(StaffResourceFromEntityAssembler::toResourceFromEntity)
+                        .toList()
+        );
     }
 }
+
+

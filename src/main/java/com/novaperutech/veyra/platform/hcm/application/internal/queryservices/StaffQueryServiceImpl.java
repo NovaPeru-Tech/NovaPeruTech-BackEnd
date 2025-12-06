@@ -67,5 +67,10 @@ public class StaffQueryServiceImpl implements StaffQueryServices {
         return staffRepository.findById(query.staffId()).map(staff->staff.getContractHistory().getLastAddedContract());
     }
 
+    @Override
+    public boolean handle(ExistStaffByNursingHomeIdQuery query) {
+        return staffRepository.existsByNursingHomeId(query.nursingHomeId());
+    }
+
 
 }
