@@ -93,4 +93,15 @@ public class IamContextFacadeImpl implements IamContextFacade {
         return result.get().getUsername();
     }
 
+    @Override
+    public boolean existsUserById(Long userId) {
+        try {
+            var query = new GetUserByIdQuery(userId);
+            var user = userQueryService.handle(query);
+            return user.isPresent();
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
 }
