@@ -193,7 +193,7 @@ public class SubscriptionCommandServiceImpl implements SubscriptionCommandServic
         if (status == SubscriptionStatus.ACTIVE) {
             var items = stripeSubscription.getItems();
             if (items != null && items.getData() != null && !items.getData().isEmpty()) {
-                SubscriptionItem firstItem = items.getData().getFirst();
+                SubscriptionItem firstItem = items.getData().get(0);
 
                 Long currentPeriodStart = firstItem.getCurrentPeriodStart();
                 Long currentPeriodEnd = firstItem.getCurrentPeriodEnd();

@@ -1,9 +1,6 @@
 package com.novaperutech.veyra.platform.payments.application.internal.commandservices;
-
-import com.novaperutech.veyra.platform.payments.application.internal.outboundservices.acl.ExternalIamService;
 import com.novaperutech.veyra.platform.payments.domain.exceptions.SubscriptionNotFoundException;
 import com.novaperutech.veyra.platform.payments.domain.model.aggregates.Payment;
-import com.novaperutech.veyra.platform.payments.domain.model.aggregates.Subscription;
 import com.novaperutech.veyra.platform.payments.domain.model.commands.ProcessPaymentCommand;
 import com.novaperutech.veyra.platform.payments.domain.model.events.PaymentFailedEvent;
 import com.novaperutech.veyra.platform.payments.domain.model.events.PaymentSucceededEvent;
@@ -29,17 +26,15 @@ public class PaymentCommandServiceImpl implements PaymentCommandService {
     private final SubscriptionRepository subscriptionRepository;
     private final StripeService stripeService;
     private final ApplicationEventPublisher eventPublisher;
-    private final ExternalIamService externalIamService;
     public PaymentCommandServiceImpl(
             PaymentRepository paymentRepository,
             SubscriptionRepository subscriptionRepository,
             StripeService stripeService,
-            ApplicationEventPublisher eventPublisher, ExternalIamService externalIamService) {
+            ApplicationEventPublisher eventPublisher) {
         this.paymentRepository = paymentRepository;
         this.subscriptionRepository = subscriptionRepository;
         this.stripeService = stripeService;
         this.eventPublisher = eventPublisher;
-        this.externalIamService = externalIamService;
     }
 
     @Override
@@ -48,7 +43,7 @@ public class PaymentCommandServiceImpl implements PaymentCommandService {
         log.info("Processing payment for subscription ID: {}", command.subscriptionId());
 
         try {
-            Subscription subscription = subscriptionRepository
+           var subscription = subscriptionRepository
                     .findById(command.subscriptionId())
                     .orElseThrow(() -> new SubscriptionNotFoundException(command.subscriptionId()));
 
@@ -67,7 +62,7 @@ public class PaymentCommandServiceImpl implements PaymentCommandService {
             log.info("PaymentIntent created: {}", paymentIntent != null ? paymentIntent.getId() : "null");
 
             Payment payment = new Payment(
-                    subscription.getId(),
+                    subscription,
                     subscription.getUserId(),
                     paymentIntent.getId(),
                     subscription.getAmount()
@@ -82,7 +77,7 @@ public class PaymentCommandServiceImpl implements PaymentCommandService {
                 PaymentSucceededEvent event = new PaymentSucceededEvent(
                         this,
                         savedPayment.getId(),
-                        savedPayment.getSubscriptionId(),
+                        savedPayment.getSubscription().getId(),
                         savedPayment.getAmount().value()
                 );
                 eventPublisher.publishEvent(event);
@@ -91,7 +86,7 @@ public class PaymentCommandServiceImpl implements PaymentCommandService {
                 PaymentFailedEvent event = new PaymentFailedEvent(
                         this,
                         savedPayment.getId(),
-                        savedPayment.getSubscriptionId(),
+                        savedPayment.getSubscription().getId(),
                         savedPayment.getFailureMessage()
                 );
                 eventPublisher.publishEvent(event);

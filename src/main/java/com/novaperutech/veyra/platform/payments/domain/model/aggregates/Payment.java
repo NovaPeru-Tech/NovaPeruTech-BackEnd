@@ -9,8 +9,9 @@ import lombok.Getter;
 @Getter
 public class Payment extends AuditableAbstractAggregateRoot<Payment> {
 
-    @Column(nullable = false)
-    private Long subscriptionId;
+    @JoinColumn(name = "subscription_id")
+    @ManyToOne()
+    private Subscription subscription;
 @Embedded
     private UserId userId;
 
@@ -36,8 +37,8 @@ public class Payment extends AuditableAbstractAggregateRoot<Payment> {
     protected Payment() {
     }
 
-    public Payment(Long subscriptionId, UserId userId, String stripePaymentIntentId, Amount amount) {
-        this.subscriptionId = subscriptionId;
+    public Payment(Subscription subscription, UserId userId, String stripePaymentIntentId, Amount amount) {
+        this.subscription = subscription;
         this.userId = userId;
         this.stripePaymentIntentId = stripePaymentIntentId;
         this.amount = amount;

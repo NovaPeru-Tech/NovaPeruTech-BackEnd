@@ -158,7 +158,6 @@ public class UserSubscriptionsController {
             @PathVariable Long subscriptionId,
             @Valid @RequestBody UpdateSubscriptionResource resource) {
 
-        // Verify subscription exists and belongs to user
         var existingSubscriptionOpt = subscriptionQueryService.handle(new GetSubscriptionByIdQuery(subscriptionId));
 
         if (existingSubscriptionOpt.isEmpty()) {

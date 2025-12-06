@@ -35,8 +35,8 @@ public class StripeServiceImpl implements StripeService {
 
     private void initializePrices() {
         try {
-            createOrUpdateProduct("Family Plan", PlanType.FAMILY);
-            createOrUpdateProduct("Nursing Home Plan", PlanType.NURSING_HOME);
+            loadOrCreateProduct("Family Plan", PlanType.FAMILY);
+            loadOrCreateProduct("Nursing Home Plan", PlanType.NURSING_HOME);
             log.info("Stripe prices initialized successfully");
         } catch (StripeException e) {
             log.error("Error initializing Stripe prices: {}", e.getMessage(), e);
@@ -44,16 +44,91 @@ public class StripeServiceImpl implements StripeService {
         }
     }
 
-    private void createOrUpdateProduct(String name, PlanType planType) throws StripeException {
-        log.info("Creating product and prices for: {}", name);
+    private void loadOrCreateProduct(String name, PlanType planType) throws StripeException {
+        log.info("Loading or creating product and prices for: {}", name);
+
+        // Buscar productos existentes
+        ProductSearchParams searchParams = ProductSearchParams.builder()
+                .setQuery("name:'" + name + "' AND active:'true'")
+                .setLimit(1L)
+                .build();
+
+        ProductSearchResult searchResult = Product.search(searchParams);
+        Product product;
+
+        if (!searchResult.getData().isEmpty()) {
+            product = searchResult.getData().get(0);
+            productIds.put(planType.name(), product.getId());
+            log.info("Found existing product: {} with ID: {}", name, product.getId());
+
+            // Cargar precios existentes
+            loadExistingPrices(product.getId(), planType, name);
+        } else {
+            // Crear nuevo producto
+            product = createNewProduct(name, planType);
+            log.info("Created new product: {} with ID: {}", name, product.getId());
+        }
+    }
+
+    private Product createNewProduct(String name, PlanType planType) throws StripeException {
         ProductCreateParams productParams = ProductCreateParams.builder()
                 .setName(name)
                 .setDescription("Subscription plan for " + name)
+                .putMetadata("planType", planType.name())
                 .build();
+
         Product product = Product.create(productParams);
         productIds.put(planType.name(), product.getId());
+
+        // Crear precios para el nuevo producto
+        createPricesForProduct(product.getId(), planType, name);
+
+        return product;
+    }
+
+    private void loadExistingPrices(String productId, PlanType planType, String name) throws StripeException {
+        PriceListParams listParams = PriceListParams.builder()
+                .setProduct(productId)
+                .setActive(true)
+                .build();
+
+        PriceCollection prices = Price.list(listParams);
+
+        boolean hasMonthly = false;
+        boolean hasAnnual = false;
+
+        for (Price price : prices.getData()) {
+            if (price.getRecurring() != null) {
+                String interval = price.getRecurring().getInterval();
+                if ("month".equals(interval)) {
+                    priceIds.put(planType.name() + "_MONTHLY", price.getId());
+                    hasMonthly = true;
+                    log.info("Loaded existing monthly price: {}", price.getId());
+                } else if ("year".equals(interval)) {
+                    priceIds.put(planType.name() + "_ANNUALLY", price.getId());
+                    hasAnnual = true;
+                    log.info("Loaded existing annual price: {}", price.getId());
+                }
+            }
+        }
+
+        // Crear precios faltantes
+        if (!hasMonthly) {
+            createMonthlyPrice(productId, planType, name);
+        }
+        if (!hasAnnual) {
+            createAnnualPrice(productId, planType, name);
+        }
+    }
+
+    private void createPricesForProduct(String productId, PlanType planType, String name) throws StripeException {
+        createMonthlyPrice(productId, planType, name);
+        createAnnualPrice(productId, planType, name);
+    }
+
+    private void createMonthlyPrice(String productId, PlanType planType, String name) throws StripeException {
         PriceCreateParams monthlyPriceParams = PriceCreateParams.builder()
-                .setProduct(product.getId())
+                .setProduct(productId)
                 .setUnitAmount((long) (planType.getMonthlyPrice() * 100))
                 .setCurrency("usd")
                 .setRecurring(
@@ -63,10 +138,15 @@ public class StripeServiceImpl implements StripeService {
                 )
                 .setNickname(name + " - Monthly")
                 .build();
+
         Price monthlyPrice = Price.create(monthlyPriceParams);
         priceIds.put(planType.name() + "_MONTHLY", monthlyPrice.getId());
+        log.info("Created monthly price for {}: {}", name, monthlyPrice.getId());
+    }
+
+    private void createAnnualPrice(String productId, PlanType planType, String name) throws StripeException {
         PriceCreateParams annualPriceParams = PriceCreateParams.builder()
-                .setProduct(product.getId())
+                .setProduct(productId)
                 .setUnitAmount((long) (planType.getAnnualPrice() * 100))
                 .setCurrency("usd")
                 .setRecurring(
@@ -76,11 +156,10 @@ public class StripeServiceImpl implements StripeService {
                 )
                 .setNickname(name + " - Annual")
                 .build();
+
         Price annualPrice = Price.create(annualPriceParams);
         priceIds.put(planType.name() + "_ANNUALLY", annualPrice.getId());
-
-        log.info("Created prices for {}: Monthly={}, Annual={}",
-                name, monthlyPrice.getId(), annualPrice.getId());
+        log.info("Created annual price for {}: {}", name, annualPrice.getId());
     }
 
     @Override
@@ -97,6 +176,7 @@ public class StripeServiceImpl implements StripeService {
                 log.info("Found existing customer: {}", existingCustomer.getId());
                 return existingCustomer;
             }
+
             CustomerCreateParams.Builder paramsBuilder = CustomerCreateParams.builder()
                     .putMetadata("userId", userId.toString());
 
@@ -123,11 +203,15 @@ public class StripeServiceImpl implements StripeService {
         try {
             log.info("Creating subscription for customer: {}, plan: {}, period: {}",
                     customerId, planType, period);
+
+            // Adjuntar método de pago al cliente
             PaymentMethod paymentMethod = PaymentMethod.retrieve(paymentMethodId);
             paymentMethod.attach(PaymentMethodAttachParams.builder()
                     .setCustomer(customerId)
                     .build());
             log.info("Payment method {} attached to customer {}", paymentMethodId, customerId);
+
+            // Establecer como método de pago predeterminado
             Customer customer = Customer.retrieve(customerId);
             customer.update(CustomerUpdateParams.builder()
                     .setInvoiceSettings(
@@ -265,7 +349,6 @@ public class StripeServiceImpl implements StripeService {
             throw new RuntimeException("Error creating payment intent: " + e.getMessage(), e);
         }
     }
-
 
     @Override
     public PaymentIntent retrievePaymentIntent(String paymentIntentId) {
